@@ -1,6 +1,6 @@
 # Aurora clone and export runbook
 
-This document contains all the steps necessary to 
+Because the `SELECT OUTFILE` command is atomic and potentially locking, we would be wise to run it against a DB clone.
 
 ## Clone Aurora
 
