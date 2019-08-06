@@ -16,4 +16,4 @@ The converter takes the exported CSV format and turns it into JSON in a differen
 
 ## Runbook
 
-In order to get the scripts to run there's a few things that need to be set up. The runbook can be found [here](/getoutreach/aurora-bootstrap/blob/master/runbook.md)
+In order to get the scripts to run there's a few things that need to be set up. The runbook can be found [here](/runbook.md)
