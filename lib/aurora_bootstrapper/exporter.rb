@@ -18,15 +18,15 @@ module AuroraBootstrapper
 
     def export!
       database_names.each do | database_name |
-        database = Database.new database_name: database_name, client: client
-        database.export!( into_bucket: export_bucket)
+        database = Database.new database_name: database_name, client: @client
+        database.export!( into_bucket: @export_bucket )
       end
     end
 
     def database_names
-      @databases ||= client.query("SHOW DATABASES")
+      @databases ||= client.query( "SHOW DATABASES" )
                             .map do |db|
-                              db["Database"] }
+                              db[ "Database" ]
                             end.select do | database_name |
                               database_name.match @match
       end

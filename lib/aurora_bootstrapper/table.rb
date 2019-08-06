@@ -19,7 +19,7 @@ module AuroraBootstrapper
     end
 
     def export!( into_bucket: )
-      @client.query( export_bucket( into_bucket: into_bucket ) )
+      @client.query( export_statement( into_bucket: into_bucket ) )
     end
 
     def export_statement( into_bucket: )
