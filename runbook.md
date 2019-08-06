@@ -4,17 +4,31 @@ This document contains all the steps necessary to
 
 ## Clone Aurora
 
+Clone your database as described in the docs [here](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Managing.Clone.html)
+
 ## Set up S3 buckets
 
-## Set up S3 permissions
+The buckets you will need to set up: 
 
-## Set up cluster permissions
+* CSV bucket: This is the bucket where the initial CSV export
+* JSON bucket: The bucket into which we will put the converted JSON
+
+## Set up permissions
+
+Since the data can be sensitive, we should be sure to have a limited set of permissions for the buckets and the Aurora clusters.
+
+There need to be 4 sets of permissions:
+
+* Auroa expoter: the `SELECT INTO OUTFILE S3` statement requires permissions described [here](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Integrating.Authorizing.IAM.S3CreatePolicy.html)
+* CSV expoter: The expoter job needs access to Aurora. This may not be necessary inside K8s, but somehting to investigate.
+* CSV-to-JSON formatter: the formatter will need list, and read premissions to the CSV bucket; and list, read, and writer persmissions to the JSON bucket
+* JSON bucket reader: this bucket will contain sensitive data and needs to have limited permissions.
   
 ## Run the exporter
 
-### Deploy the container to the appropriate namespace
+Deploying the exporter will run the job, but there's some minimal setup that needs to happen.
 
-### Set up the env vars
+### Env vars
 
 The container needs to know what to connect to and the way the script works is it gets the values from its env. Here's what you need to set up:
 
@@ -29,7 +43,7 @@ Once the export is completed and your CSV is all good to go, you will need to co
 
 *NOTE*: The converter will run against the specified folder and all subfolders.
 
-### Set up env vars
+### Env vars
 
 The exporter needs to know what data to process and where to process it into. It gets the values from the env. Here's what you need to set up:
 
