@@ -12,7 +12,7 @@ module AuroraBootstrapper
     end
 
     def export!( into_bucket )
-      table_names.each do | table_name |
+      table_names.all? do | table_name |
         table = Table.new database_name: @database_name, table_name: table_name, client: @client
         table.export!( into_bucket: into_bucket )
       end

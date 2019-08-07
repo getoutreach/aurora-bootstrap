@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+
+require 'zeitwerk'
+require_relative "../lib/aurora_bootstrapper"
+
+db_user = ENV.fetch "DB_USER"
+db_pass = ENV.fetch "DB_PASS"
+db_host = ENV.fetch "DB_HOST"
+prefix  = ENV.fetch "PREFIX", ""
+bukkit  = ENV.fetch "EXPORT_BUCKET"
+
+AuroraBootstrapper::Exporter.new( db_host: db_host,
+                                  db_user: db_user,
+                                  db_pass: db_pass,
+                                   prefix: prefix,
+                            export_bucket: bukkit ).export!

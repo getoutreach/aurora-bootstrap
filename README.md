@@ -14,6 +14,17 @@ The expoter logs into the specified aurora instance, scans the databases, and th
 
 The converter takes the exported CSV format and turns it into JSON in a different bucket.
 
+### Running tests
+
+The tests run inside a dockerized db, so you will need to
+
+```bash
+# start the database
+$ docker-compose up -d
+# load the fixtures into it
+$ ./bin/test_setup
+```
+
 ## Runbook
 
 In order to get the scripts to run there's a few things that need to be set up. The runbook can be found [here](/runbook.md)

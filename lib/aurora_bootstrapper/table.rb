@@ -19,7 +19,12 @@ module AuroraBootstrapper
     end
 
     def export!( into_bucket: )
-      @client.query( export_statement( into_bucket: into_bucket ) )
+      result = @client.query( export_statement( into_bucket: into_bucket ) )
+      Logger.info( "Export succeeded: #{result.inspect}" )
+      true
+    rescue => e
+      Logger.fatal( "Export failed: #{e}" )
+      false
     end
 
     def export_statement( into_bucket: )

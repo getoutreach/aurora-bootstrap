@@ -17,7 +17,7 @@ module AuroraBootstrapper
     end
 
     def export!
-      database_names.each do | database_name |
+      database_names.all? do | database_name |
         database = Database.new database_name: database_name, client: @client
         database.export!( into_bucket: @export_bucket )
       end

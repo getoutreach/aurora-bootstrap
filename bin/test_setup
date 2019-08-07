@@ -1,0 +1,4 @@
+#!/bin/bash
+
+CONTAINER_ID=`docker ps | grep bootstrapper-mysql | grep  -o "^[0-9a-z]*"`
+docker exec $CONTAINER_ID /bin/sh -c 'mysql -u root -proot'
