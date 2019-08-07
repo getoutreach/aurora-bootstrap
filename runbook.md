@@ -19,8 +19,8 @@ Since the data can be sensitive, we should be sure to have a limited set of perm
 
 There need to be 4 sets of permissions:
 
-* Auroa expoter: the `SELECT INTO OUTFILE S3` statement requires permissions described [here](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Integrating.Authorizing.IAM.S3CreatePolicy.html)
-* CSV expoter: The expoter job needs access to Aurora. This may not be necessary inside K8s, but somehting to investigate.
+* Auroa exporter: the `SELECT INTO OUTFILE S3` statement requires permissions described [here](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Integrating.Authorizing.IAM.S3CreatePolicy.html)
+* CSV exporter: The exporter job needs access to Aurora. This may not be necessary inside K8s, but somehting to investigate.
 * CSV-to-JSON formatter: the formatter will need list, and read premissions to the CSV bucket; and list, read, and writer persmissions to the JSON bucket
 * JSON bucket reader: this bucket will contain sensitive data and needs to have limited permissions.
   
