@@ -7,7 +7,7 @@ module AuroraBootstrapper
     end
 
     def fields
-      @fields ||= client.query("DESC #{ @database_name }.#{ @table_name }").map do | row |
+      @fields ||= @client.query("DESC #{ @database_name }.#{ @table_name }").map do | row |
         row[ "Field" ]
       end
     end
@@ -20,10 +20,10 @@ module AuroraBootstrapper
 
     def export!( into_bucket: )
       result = @client.query( export_statement( into_bucket: into_bucket ) )
-      Logger.info( "Export succeeded: #{result.inspect}" )
+      AuroraBootstrapper.logger.info( "Export succeeded: #{result.inspect}" )
       true
     rescue => e
-      Logger.fatal( "Export failed: #{e}" )
+      AuroraBootstrapper.logger.fatal( "Export failed: #{e}" )
       false
     end
 
@@ -33,7 +33,7 @@ module AuroraBootstrapper
           UNION ALL
         SELECT #{ fields.join(', ') }
           FROM #{ @database_name }.#{ @table_name }
-        INTO OUTFILE S3 #{ into_bucket }
+        INTO OUTFILE S3 '#{ into_bucket }'
           FIELDS TERMINATED BY '#{ AuroraBootstrapper::COL_DELIMITER }'
           LINES TERMINATED BY '#{ AuroraBootstrapper::COL_DELIMITER }'
           OVERWRITE ON

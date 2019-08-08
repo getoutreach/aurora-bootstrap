@@ -1,11 +1,13 @@
 $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
-require 'webmock/minitest'
-require 'mocha'
 require 'simplecov'
+require 'dotenv'
+
+Dotenv.load('.env.test')
+
 SimpleCov.start do
   add_filter "/test/"
 end
 
-require "aurora_bootstrapper"
+require_relative "../lib/aurora_bootstrapper"
 require "minitest/autorun"
-
+require "mocha/minitest"

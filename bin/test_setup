@@ -1,4 +1,6 @@
 #!/bin/bash
 
 CONTAINER_ID=`docker ps | grep bootstrapper-mysql | grep  -o "^[0-9a-z]*"`
-docker exec $CONTAINER_ID /bin/sh -c 'mysql -u root -proot'
+docker exec -i $CONTAINER_ID mysql -uroot -proot  <<< `cat ./test/user.sql`
+docker exec -i $CONTAINER_ID mysql -uroot -proot  <<< `cat ./test/drop.sql`
+docker exec -i $CONTAINER_ID mysql -uroot -proot  <<< `cat ./test/fixtures.sql`
