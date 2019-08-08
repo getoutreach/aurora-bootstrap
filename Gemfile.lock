@@ -1,0 +1,36 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    docile (1.3.2)
+    dotenv (2.7.5)
+    json (2.2.0)
+    metaclass (0.0.4)
+    minitest (5.11.3)
+    minitest-logger (0.1.1)
+      minitest
+    mocha (1.9.0)
+      metaclass (~> 0.0.1)
+    mysql2 (0.5.2)
+    rake (12.3.3)
+    simplecov (0.17.0)
+      docile (~> 1.1)
+      json (>= 1.8, < 3)
+      simplecov-html (~> 0.10.0)
+    simplecov-html (0.10.2)
+    zeitwerk (2.1.9)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  dotenv
+  minitest
+  minitest-logger
+  mocha
+  mysql2
+  rake
+  simplecov
+  zeitwerk
+
+BUNDLED WITH
+   1.17.3

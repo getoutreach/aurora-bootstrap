@@ -35,7 +35,8 @@ module AuroraBootstrapper
           FROM #{ @database_name }.#{ @table_name }
         INTO OUTFILE S3 '#{ into_bucket }'
           FIELDS TERMINATED BY '#{ AuroraBootstrapper::COL_DELIMITER }'
-          LINES TERMINATED BY '#{ AuroraBootstrapper::COL_DELIMITER }'
+          LINES TERMINATED BY '#{ AuroraBootstrapper::ROW_DELIMITER }'
+          MANIFEST ON
           OVERWRITE ON
       SQL
     end
