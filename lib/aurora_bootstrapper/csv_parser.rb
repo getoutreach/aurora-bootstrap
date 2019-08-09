@@ -40,7 +40,7 @@ module AuroraBootstrapper
 
     def parts
       manifest_json[ "entries" ].map do | entry |
-        bucket, database, table = entry[ "url" ].split('//').last.split('/')
+        bucket, database, table = entry[ "url" ].split('://').last.split("/")
         { bucket: bucket,
             file: "#{database}/#{table}" }
       end
