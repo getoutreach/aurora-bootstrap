@@ -64,8 +64,14 @@ class TableTest < Minitest::Test
   end
 
   def test_export
+    # because those logs aren't actually useful
+    old_logger = AuroraBootstrapper.logger
+    AuroraBootstrapper.logger = Logger.new( '/dev/null' )
+
     AuroraBootstrapper::Table.any_instance.stubs( :export_statement ).returns( "select 'hurrah'" )
 
     assert @exporter.export!
+
+    AuroraBootstrapper.logger = old_logger
   end
 end

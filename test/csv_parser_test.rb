@@ -18,10 +18,46 @@ class CsvParserTest < Minitest::Test
   end
 
   def test_hasherize
+    @parser.stubs( :fields ).returns( ["id", "event_name"] )
 
+    # remainder tests
+    assert_equal [ [], "a" ], @parser.hasherize( chunk: "a" )
+    assert_equal [ [], "ba" ], @parser.hasherize( chunk: "a", remainder: "b" )
+
+    # record with no row delimiter at the end
+    assert_equal [ [ { "id" => "1", "event_name" => "lol" } ], "" ],
+                  @parser.hasherize( chunk: "1#{AuroraBootstrapper::COL_DELIMITER}lol" )
+
+    # record with row delimiter at the end
+    assert_equal [ [ { "id" => "1", "event_name" => "lol" } ], "" ],
+                  @parser.hasherize( chunk: "1#{AuroraBootstrapper::COL_DELIMITER}lol#{AuroraBootstrapper::ROW_DELIMITER}" )
+
+    # record with row delimiter at the beginning
+    assert_equal [ [ { "id" => "1", "event_name" => "lol" } ], "" ],
+                  @parser.hasherize( chunk: "#{AuroraBootstrapper::ROW_DELIMITER}1#{AuroraBootstrapper::COL_DELIMITER}lol" )
+
+    # record with row delimiter at the beginning
+    assert_equal [ [ { "id" => "1", "event_name" => "lol" },
+                     { "id" => "2", "event_name" => "wat" } ], "" ],
+                  @parser.hasherize( chunk: "lol#{AuroraBootstrapper::ROW_DELIMITER}2#{AuroraBootstrapper::COL_DELIMITER}wat", remainder: "1#{AuroraBootstrapper::COL_DELIMITER}" )
+
+    # payload complete with remainder
+    assert_equal [ [ { "id" => "1", "event_name" => "lol" } ], "4" ],
+                  @parser.hasherize( chunk: "1#{AuroraBootstrapper::COL_DELIMITER}lol#{AuroraBootstrapper::ROW_DELIMITER}4" )
+
+    # record split across payloads
+    assert_equal [ [ { "id" => "1", "event_name" => "lol" } ], "4" ],
+                  @parser.hasherize( chunk: "#{AuroraBootstrapper::COL_DELIMITER}lol#{AuroraBootstrapper::ROW_DELIMITER}4", remainder: "1" )
+
+    # record split in the middle of the delimiter
+    assert_equal [ [ { "id" => "1", "event_name" => "lol" } ], "4" ],
+                  @parser.hasherize( chunk: "#{AuroraBootstrapper::COL_DELIMITER[11..-1]}lol#{AuroraBootstrapper::ROW_DELIMITER}4", remainder: "1#{AuroraBootstrapper::COL_DELIMITER[0..10]}" )
   end
 
   def test_read
-
+    @parser.read do |chunk|
+      assert_equal 15, chunk.count
+      assert_equal @parser.fields, chunk.first.keys
+    end
   end
 end
