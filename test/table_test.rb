@@ -35,21 +35,13 @@ class TableTest < Minitest::Test
         UNION ALL
       SELECT id, email, first_name, last_name
         FROM master.users
-      INTO OUTFILE S3 's3://bukkit'
-        FIELDS TERMINATED BY ' OUTREACH-AURORA-EXPORT-COL-DELIMITER '
-        LINES TERMINATED BY ' OUTREACH-AURORA-EXPORT-ROW-DELIMITER '
+      INTO OUTFILE S3 's3://bukkit/master/users'
+        FIELDS TERMINATED BY 'AURORA-BOOTSTRAP-EXPORT-COL-DELIMITER'
+        LINES TERMINATED BY 'AURORA-BOOTSTRAP-EXPORT-ROW-DELIMITER'
         MANIFEST ON
         OVERWRITE ON
     SQL
     assert_equal expected, @table.export_statement( into_bucket: "s3://bukkit")
-  end
-
-  class PutsLogger
-    [:fatal, :error, :warn, :info, :debug].each do |severity|
-      define_method severity do | message, &block |
-        puts message
-      end
-    end
   end
 
   def test_export_logs

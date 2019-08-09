@@ -1,0 +1,7 @@
+{
+   "entries" : [
+      {
+         "url" : "local://local-bucket/database/events.part_00000"
+      }
+   ]
+}
