@@ -2,15 +2,15 @@ require 'test_helper'
 
 class CsvParserTest < Minitest::Test
   def setup
-    @parser = AuroraBootstrapper::CsvParser.new bucket: "local-bucket", table: "local-events", client: Gls::S2.new
+    @parser = AuroraBootstrapper::CsvParser.new bucket: "local-bucket", table: "my-database/local-events", client: Gls::S2.new
   end
 
   def test_manifest_json
-    assert_equal( {"entries"=>[{"url"=>"local://local-bucket/database/events.part_00000"}]}, @parser.manifest_json )
+    assert_equal( {"entries"=>[{"url"=>"local://local-bucket/my-database/events.part_00000"}, {"url"=>"local://local-bucket/my-database/events.part_00001"}]}, @parser.manifest_json )
   end
 
   def test_parts
-    assert_equal [{ bucket: "local-bucket", file: "database/events.part_00000"}], @parser.parts
+    assert_equal [{ bucket: "local-bucket", file: "my-database/events.part_00000"}, {:bucket=>"local-bucket", :file=>"my-database/events.part_00001"}], @parser.parts
   end
 
   def test_fields
@@ -54,10 +54,51 @@ class CsvParserTest < Minitest::Test
                   @parser.hasherize( chunk: "#{AuroraBootstrapper::COL_DELIMITER[11..-1]}lol#{AuroraBootstrapper::ROW_DELIMITER}4", remainder: "1#{AuroraBootstrapper::COL_DELIMITER[0..10]}" )
   end
 
+  def test_header_row
+    @parser.stubs( :fields ).returns( ["id", "event_name"] )
+    assert @parser.header_row?( [ "id", "event_name" ] )
+    refute @parser.header_row?( [ "6", "event_name" ] )
+    refute @parser.header_row?( [ "6" ] )
+    refute @parser.header_row?( [ "event_name" ] )
+
+    chunk = "id#{AuroraBootstrapper::COL_DELIMITER}event_name#{AuroraBootstrapper::ROW_DELIMITER}1#{AuroraBootstrapper::COL_DELIMITER}failboat"
+
+    assert_equal 1, @parser.hasherize( chunk: chunk ).first.count
+    assert_equal [ { "id" => "1", "event_name" => "failboat" } ], @parser.hasherize( chunk: chunk ).first
+  end
+
   def test_read
+    rows = []
     @parser.read do |chunk|
-      assert_equal 15, chunk.count
+      rows += chunk
+      assert_equal 14, chunk.count
       assert_equal @parser.fields, chunk.first.keys
     end
+
+    assert_equal 28, rows.count
+  end
+
+  def test_read_across_file_chunks
+    @parser = AuroraBootstrapper::CsvParser.new bucket: "local-bucket", table: "my-database/local-events", client: Gls::S2.new, csv_chunk_size: 0.01
+    
+    rows = []
+    @parser.read do |chunk|
+      rows += chunk
+    end
+
+    assert_equal @parser.fields, rows.first.keys
+    assert_equal 28, rows.count
+
+    # let's see if this works if the chunks are narrower than row sizes
+
+    @parser = AuroraBootstrapper::CsvParser.new bucket: "local-bucket", table: "my-database/local-events", client: Gls::S2.new, csv_chunk_size: 0.001
+    
+    rows = []
+    @parser.read do |chunk|
+      rows += chunk
+    end
+
+    assert_equal @parser.fields, rows.first.keys
+    assert_equal 28, rows.count
   end
 end

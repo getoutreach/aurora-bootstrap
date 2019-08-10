@@ -6,8 +6,6 @@ GEM
     json (2.2.0)
     metaclass (0.0.4)
     minitest (5.11.3)
-    minitest-logger (0.1.1)
-      minitest
     mocha (1.9.0)
       metaclass (~> 0.0.1)
     mysql2 (0.5.2)
@@ -25,7 +23,6 @@ PLATFORMS
 DEPENDENCIES
   dotenv
   minitest
-  minitest-logger
   mocha
   mysql2
   rake

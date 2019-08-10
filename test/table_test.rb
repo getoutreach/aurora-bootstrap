@@ -45,33 +45,31 @@ class TableTest < Minitest::Test
   end
 
   def test_export_logs
-    old_logger = AuroraBootstrapper.logger
-    AuroraBootstrapper.logger = PutsLogger.new
+    with_logger PutsLogger.new do
 
-    assert_output /Export failed:/ do
-      @table.export!( into_bucket: "s3://bukkit")
+      assert_output /Export failed:/ do
+        @table.export!( into_bucket: "s3://bukkit")
+      end
+
+      mock = Minitest::Mock.new
+      mock.expect :export!, nil
+
+      @client.stubs( :query ).returns( "yay" )
+      
+      assert_output /Export succeeded: / do
+        assert @table.export!( into_bucket: "s3://bukkit")
+      end
     end
-
-    mock = Minitest::Mock.new
-    mock.expect :export!, nil
-
-    @client.stubs( :query ).returns( "yay" )
-    
-    assert_output /Export succeeded: / do
-      assert @table.export!( into_bucket: "s3://bukkit")
-    end
-    AuroraBootstrapper.logger = old_logger
   end
 
   def test_export
     # because those logs aren't actually useful
-    old_logger = AuroraBootstrapper.logger
-    AuroraBootstrapper.logger = Logger.new( '/dev/null' )
+    with_nil_logger do
 
-    AuroraBootstrapper::Table.any_instance.stubs( :export_statement ).returns( "select 'hurrah'" )
+      AuroraBootstrapper::Table.any_instance.stubs( :export_statement ).returns( "select 'hurrah'" )
 
-    assert @exporter.export!
+      assert @exporter.export!
 
-    AuroraBootstrapper.logger = old_logger
+    end
   end
 end

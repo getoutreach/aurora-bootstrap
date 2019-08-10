@@ -3,6 +3,7 @@ require "logger"
 require "json"
 
 module AuroraBootstrapper
+  autoload :Converter, "aurora_bootstrapper/converter"
   autoload :CsvParser, "aurora_bootstrapper/csv_parser"
   autoload :Database,  "aurora_bootstrapper/database"
   autoload :Exporter,  "aurora_bootstrapper/exporter"

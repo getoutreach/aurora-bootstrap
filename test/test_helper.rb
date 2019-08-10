@@ -16,12 +16,43 @@ class PutsLogger
   end
 end
 
+def with_logger( logger )
+  old_logger = AuroraBootstrapper.logger
+  AuroraBootstrapper.logger = logger
+
+  yield
+  
+  AuroraBootstrapper.logger = old_logger
+end
+
+def with_nil_logger
+  with_logger Logger.new( "/dev/null" ) do
+    yield
+  end
+end
+
 # Greg's local services
 module Gls
   # something storage
   class S2
+    class << self
+      attr_accessor :files_written
+    end
+
     def get_object( bucket:, key:, range: "" )
       FileObject.new path: "#{bucket}/#{key}", range: range
+    end
+
+    def put_object( acl:, body:, bucket:, key: )
+      self.class.files_written ||= []
+
+      self.class.files_written << { acl: acl,
+                                   body: body,
+                                 bucket: bucket,
+                                    key: key }
+
+      return { etag: "\"6805f2cfc46c0f04559748bb039d69ae\"", 
+         version_id: "Kirh.unyZwjQ69YxcQLA8z4F5j3kJJKr" }
     end
   end
 

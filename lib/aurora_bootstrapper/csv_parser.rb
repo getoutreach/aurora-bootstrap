@@ -1,18 +1,12 @@
 module AuroraBootstrapper
   class CsvParser
-    class << self
-      attr_accessor :csv_chunk_size
-    end
-
     MB_IN_BYTES = 1048576
 
-    # 10MB seems like a reasonable chunk size
-    self.csv_chunk_size = 10
-
-    def initialize( bucket:, table:, client: )
-      @bucket   = bucket
-      @table    = table
-      @client   = client
+    def initialize( bucket:, table:, client:, csv_chunk_size: 10 )
+      @bucket         = bucket
+      @table          = table
+      @client         = client
+      @csv_chunk_size = csv_chunk_size
     end
 
     def read
@@ -23,8 +17,8 @@ module AuroraBootstrapper
                                                 key: file,
                                               range: range_header( number: 0, size_in_mb: 1/512 ) ).content_length
 
-        parts_number = ( content_length * 1.0 / ( MB_IN_BYTES * self.class.csv_chunk_size ) ).ceil
-
+        parts_number = ( content_length * 1.0 / ( MB_IN_BYTES * @csv_chunk_size ) ).ceil
+        
         parts_number.times do | part_number |
           chunk = file_body(   file: file,
                               range: range_header( number: part_number ) )
@@ -67,11 +61,11 @@ module AuroraBootstrapper
       end
     end
 
-    def range_header( number:, size_in_mb: self.class.csv_chunk_size )
+    def range_header( number:, size_in_mb: @csv_chunk_size )
       start = number * size_in_mb * MB_IN_BYTES
       stop  = start + ( size_in_mb * MB_IN_BYTES ) - 1
 
-      "bytes=#{start}-#{stop}"
+      "bytes=#{start.floor}-#{stop.ceil}"
     end
 
     def file_body( file:, bucket: @bucket, range: "" )
@@ -97,11 +91,16 @@ module AuroraBootstrapper
         if columns.count < fields.count
           # we assume that they're in the next chunk, so we add them to the remainder
           remainder = csv_row
-        else
+        # let's be sure not to add the headers as a row into the export
+        elsif !header_row?( columns )
           # otherwise, they'll go in the current json
           rows << fields.zip( columns ).to_h
         end
       end, remainder
+    end
+
+    def header_row?( columns )
+      ( fields - columns ).empty?
     end
   end
 end
