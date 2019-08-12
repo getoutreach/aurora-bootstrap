@@ -1,3 +1,3 @@
-DROP DATABASE master;
-DROP DATABASE user_stuff;
-DROP DATABASE user_properties;
+DROP DATABASE IF EXISTS master;
+DROP DATABASE IF EXISTS user_stuff;
+DROP DATABASE IF EXISTS user_properties;
