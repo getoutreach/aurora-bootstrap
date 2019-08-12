@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+require 'zeitwerk'
+require 'aws-sdk-s3'
+require_relative "../lib/aurora_bootstrapper"
+
+out_of_csv_bucket = ENV.fetch "INPUT_CSV_PATH"
+into_json_bucket  = ENV.fetch "EXPORT_JSON_PATH"
+tables            = ENV.fetch "TABLES"
+client            = Aws::S3.new
+
+AuroraBootstrapper::Converter.new( out_of_csv_bucket: out_of_csv_bucket,
+                                    into_json_bucket: into_json_bucket,
+                                              tables: tables,
+                                              client: client ).convert!

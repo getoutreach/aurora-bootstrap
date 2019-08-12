@@ -1,17 +1,14 @@
+require 'mysql2'
+
 module AuroraBootstrapper
   class Exporter
     attr_reader :client
 
-    def initialize( db_host:, db_user:, db_pass:, prefix: "", export_bucket:, blacklisted_tables: "" )
-      @db_host            = db_host
-      @db_user            = db_user
-      @db_pass            = db_pass
+    def initialize( client:, prefix: "", export_bucket:, blacklisted_tables: "" )
       @match              = "#{prefix}.*"
       @export_bucket      = export_bucket
       @blacklisted_tables = blacklisted_tables.split(",")
-      @client  = Mysql2::Client.new(     host: db_host,
-                                     username: db_user,
-                                     password: db_pass)
+      @client             = client
     end
 
     def export!

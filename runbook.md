@@ -51,6 +51,7 @@ The exporter needs to know what data to process and where to process it into. It
 
 * `INPUT_CSV_PATH`: the full `s3://bukkit/path/to/source/parent/dir` of the directory that will be recursively converted.
 * `EXPORT_JSON_PATH`: the full `s3://bukkit/path/to/target/parent/dir` of the directory that will receive all the converted files with identical directory strucuture as the source
+* `TABLES`: list of tables to be converted in a spaceless CSV `database.table` format.
 * `AWS_ACCESS_KEY_ID`: AWS access key id for auth to both buckets
 * `AWS_SECRET_ACCESS_KEY`: AWS secret access key for auth to both buckets
 

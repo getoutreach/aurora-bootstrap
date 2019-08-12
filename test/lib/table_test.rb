@@ -2,20 +2,17 @@ require 'test_helper'
 
 class TableTest < Minitest::Test
   def setup
-    @db_user   = ENV.fetch "DB_USER"
-    @db_pass   = ENV.fetch "DB_PASS"
-    @db_host   = ENV.fetch "DB_HOST"
-    @prefix    = ENV.fetch "PREFIX", ""
-    @bukkit    = ENV.fetch "EXPORT_BUCKET"
-    @blacklist = ENV.fetch "BLACKLISTED_TABLES", ""
+    @prefix   = ENV.fetch "PREFIX", ""
+    @bukkit   = ENV.fetch "EXPORT_BUCKET"
 
-    @exporter  = AuroraBootstrapper::Exporter.new( db_host: @db_host,
-                                                   db_user: @db_user,
-                                                   db_pass: @db_pass,
-                                                    prefix: @prefix,
-                                             export_bucket: @bukkit,
-                                        blacklisted_tables: @blacklist )
-    @client    = @exporter.client
+    @client   = Mysql2::Client.new( host: ENV.fetch( "DB_HOST" ),
+                                username: ENV.fetch( "DB_USER" ),
+                                password: ENV.fetch( "DB_PASS" ))
+
+
+    @exporter = AuroraBootstrapper::Exporter.new( client: @client,
+                                                  prefix: @prefix,
+                                           export_bucket: @bukkit )
     @table     = AuroraBootstrapper::Table.new database_name: "master",
                                                   table_name: "users",
                                                       client: @client
