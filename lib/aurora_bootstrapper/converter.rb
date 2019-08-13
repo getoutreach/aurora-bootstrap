@@ -1,5 +1,6 @@
 module AuroraBootstrapper
   class Converter
+
     def initialize( out_of_csv_bucket:, into_json_bucket:, tables:, client: )
       @out_of_csv_bucket = out_of_csv_bucket
       @into_json_bucket  = into_json_bucket
@@ -18,15 +19,15 @@ module AuroraBootstrapper
             chunk_part += 1
           end
         rescue => e
-          AuroraBootstrapper.logger.error e
-          Rollbar.error(e)
+          AuroraBootstrapper.logger.error message: "Error in converting #{@out_of_csv_bucket}/#{@table}", error: e
         end
       end
     end
 
 
     def write( payload:, name: )
-      AuroraBootstrapper.logger.info "Writing to #{@into_json_bucket}/#{name}"
+      AuroraBootstrapper.logger.info message: "Writing to #{@into_json_bucket}/#{name}"
+
       @client.put_object( acl: "authenticated-read", 
                          body: payload, 
                        bucket: @into_json_bucket, 

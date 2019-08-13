@@ -28,6 +28,28 @@ class ExporterTest < Minitest::Test
     assert_equal [ "information_schema", "master", "mysql", "performance_schema", "sys", "user_properties", "user_stuff" ], everything_exporter.database_names
   end
 
+  def test_database_names_logs_on_bad_connection
+    with_puts_logger do
+      exporter = AuroraBootstrapper::Exporter.new( client: nil,
+                                                    prefix: @prefix,
+                                             export_bucket: @bukkit )
+
+      assert_output "{:message=>\"Error getting databases\", :error=>#<NoMethodError: undefined method `query' for nil:NilClass>}\n" do
+        exporter.database_names
+      end
+    end
+  end
+
+  def test_export_logs_on_error
+    with_puts_logger do
+      AuroraBootstrapper::Database.any_instance.stubs( :table_names ).returns( 5 )
+
+      assert_output "{:message=>\"Error in database user_properties\", :error=>#<NoMethodError: undefined method `all?' for 5:Integer>}\n" do
+        @exporter.export!
+      end
+    end
+  end
+
   def test_export_calls_database
     mock = Minitest::Mock.new
     mock.expect :export!, nil

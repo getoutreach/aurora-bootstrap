@@ -1,6 +1,3 @@
-require "logger"
-require 'rollbar'
-require 'multi_json'
 require "json"
 
 module AuroraBootstrapper
@@ -8,6 +5,8 @@ module AuroraBootstrapper
   autoload :CsvParser, "aurora_bootstrapper/csv_parser"
   autoload :Database,  "aurora_bootstrapper/database"
   autoload :Exporter,  "aurora_bootstrapper/exporter"
+  autoload :File,      "aurora_bootstrapper/file"
+  autoload :Logger,    "aurora_bootstrapper/logger"
   autoload :Table,     "aurora_bootstrapper/table"
 
   ROW_DELIMITER = -'AURORA-BOOTSTRAP-EXPORT-ROW-DELIMITER'
@@ -17,9 +16,5 @@ module AuroraBootstrapper
     attr_accessor :logger
   end
 
-  self.logger = ::Logger.new( STDOUT )
-
-  Rollbar.configure do |config|
-    config.access_token = ENV.fetch "ROLLBAR_TOKEN"
-  end
+  self.logger = Logger.new( STDOUT )
 end

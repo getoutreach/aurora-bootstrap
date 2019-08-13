@@ -10,7 +10,8 @@ class CsvParserTest < Minitest::Test
   end
 
   def test_parts
-    assert_equal [{ bucket: "local-bucket", file: "my-database/events.part_00000"}, {:bucket=>"local-bucket", :file=>"my-database/events.part_00001"}], @parser.parts
+    assert_equal [{ bucket: "local-bucket", file_name: "my-database/events.part_00000", csv_chunk_size: 10 },
+                  { bucket: "local-bucket", file_name: "my-database/events.part_00001", csv_chunk_size: 10 }], @parser.parts.map( &:to_h )
   end
 
   def test_fields

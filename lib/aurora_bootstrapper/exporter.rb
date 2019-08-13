@@ -15,10 +15,9 @@ module AuroraBootstrapper
       database_names.all? do | database_name |
         begin
           database = Database.new database_name: database_name, client: @client, blacklisted_tables: @blacklisted_tables
-          database.export!( into_bucket: @export_bucket )
+          database.export! into_bucket: @export_bucket
         rescue => e
-          AuroraBootstrapper.logger.error e
-          Rollbar.error(e)
+          AuroraBootstrapper.logger.error message: "Error in database #{database_name}", error: e
         end
       end
     end
@@ -30,6 +29,9 @@ module AuroraBootstrapper
                             end.select do | database_name |
                               database_name.match @match
       end
+    rescue => e
+      AuroraBootstrapper.logger.fatal message: "Error getting databases", error: e
+      []
     end
   end
 end

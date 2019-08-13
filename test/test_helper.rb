@@ -11,8 +11,8 @@ end
 
 class PutsLogger
   [:fatal, :error, :warn, :info, :debug].each do |severity|
-    define_method severity do | message, &block |
-      puts message
+    define_method severity do | args, &block |
+      puts args.inspect
     end
   end
 end
@@ -24,6 +24,12 @@ def with_logger( logger )
   yield
   
   AuroraBootstrapper.logger = old_logger
+end
+
+def with_puts_logger
+  with_logger PutsLogger.new do
+    yield
+  end
 end
 
 def with_nil_logger

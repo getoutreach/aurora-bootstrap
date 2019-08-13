@@ -1,7 +1,5 @@
 module AuroraBootstrapper
   class CsvParser
-    MB_IN_BYTES = 1048576
-
     def initialize( bucket:, table:, client:, csv_chunk_size: 10 )
       @bucket         = bucket
       @table          = table
@@ -10,18 +8,12 @@ module AuroraBootstrapper
     end
 
     def read
-      parts.each do | part |
-        file           = part[ :file ]
+      parts.each do | file |
         remainder      = ""
-        content_length = @client.get_object( bucket: @bucket,
-                                                key: file,
-                                              range: range_header( number: 0, size_in_mb: 1/512 ) ).content_length
 
-        parts_number = ( content_length * 1.0 / ( MB_IN_BYTES * @csv_chunk_size ) ).ceil
-        
-        parts_number.times do | part_number |
-          chunk = file_body(   file: file,
-                              range: range_header( number: part_number ) )
+        file.number_of_parts.times do | part_number |
+
+          chunk = file.body( part_number: part_number )
 
           # parse the current chunk; append any leftovers to the remainder
           rows_hash, remainder = hasherize( chunk: chunk, remainder: remainder )
@@ -35,44 +27,36 @@ module AuroraBootstrapper
     def parts
       manifest_json[ "entries" ].map do | entry |
         bucket, database, table = entry[ "url" ].split('://').last.split("/")
-        { bucket: bucket,
-            file: "#{database}/#{table}" }
+        
+        File.new( client: @client,
+                  bucket: bucket,
+               file_name: "#{database}/#{table}",
+          csv_chunk_size: @csv_chunk_size )
       end
     end
 
     def manifest_json
-      @manifest_json ||= JSON.parse( file_body( file: "#{@table}.manifest" ) )
+      @manifest_json ||= JSON.parse( manifest.body )
+    end
+
+    def manifest
+      @manifest ||= File.new( client: @client,
+                              bucket: @bucket,
+                           file_name: "#{@table}.manifest",
+                      csv_chunk_size: @csv_chunk_size )
     end
 
     def fields
       @fields ||= begin
-        part   = parts.first
+        # if the column list takes more than a MB, I'm becoming a corn farmer
+        chunk = parts.first.body( size_in_mb: 1 )
 
-        file   = part[ :file ]
+        header_row = chunk.split( AuroraBootstrapper::ROW_DELIMITER ).first
 
-        # if the column list takes more than 2MB, I'm becoming a corn farmer
-        range  = range_header number: 0, size_in_mb: 2
-
-        header_chunk = file_body(   file: file,
-                                   range: range )
-
-        header_chunk.split( AuroraBootstrapper::ROW_DELIMITER ).first.
-                     split( AuroraBootstrapper::COL_DELIMITER )
+        header_row.split( AuroraBootstrapper::COL_DELIMITER )
       end
     end
 
-    def range_header( number:, size_in_mb: @csv_chunk_size )
-      start = number * size_in_mb * MB_IN_BYTES
-      stop  = start + ( size_in_mb * MB_IN_BYTES ) - 1
-
-      "bytes=#{start.floor}-#{stop.ceil}"
-    end
-
-    def file_body( file:, bucket: @bucket, range: "" )
-      @client.get_object( bucket: bucket,
-                             key: file,
-                           range: range ).body.read
-    end
 
     def hasherize( chunk:, remainder: "" )
       # if there's left over columns from the previous chunk, let's prepend them
@@ -98,6 +82,7 @@ module AuroraBootstrapper
         end
       end, remainder
     end
+
 
     def header_row?( columns )
       ( fields - columns ).empty?

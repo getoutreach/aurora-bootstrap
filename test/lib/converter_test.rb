@@ -10,7 +10,7 @@ class ConverterTest < Minitest::Test
   end
 
   def test_missing_table_logs_but_does_not_raise
-    with_logger PutsLogger.new do
+    with_puts_logger do
       assert_output /my-database.users/ do
         @converter.convert!
       end
@@ -21,7 +21,7 @@ class ConverterTest < Minitest::Test
   end
 
   def test_conversion
-    with_logger PutsLogger.new do
+    with_puts_logger do
       assert_output /Writing to remote-bucket\/my-database\/local-events.0.json/ do
         @converter.convert!
       end
