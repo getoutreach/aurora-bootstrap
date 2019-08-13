@@ -9,6 +9,9 @@ gem 'mysql2'
 # converter
 gem 'aws-sdk-s3'
 
+gem 'rollbar'
+gem 'multi_json'
+
 group :development, :test do
   gem 'minitest'
   gem 'simplecov'

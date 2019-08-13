@@ -25,8 +25,10 @@ GEM
     minitest (5.11.3)
     mocha (1.9.0)
       metaclass (~> 0.0.1)
+    multi_json (1.13.1)
     mysql2 (0.5.2)
     rake (12.3.3)
+    rollbar (2.21.0)
     simplecov (0.17.0)
       docile (~> 1.1)
       json (>= 1.8, < 3)
@@ -42,8 +44,10 @@ DEPENDENCIES
   dotenv
   minitest
   mocha
+  multi_json
   mysql2
   rake
+  rollbar
   simplecov
   zeitwerk
 

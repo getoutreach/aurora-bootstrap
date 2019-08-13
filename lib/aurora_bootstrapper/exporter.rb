@@ -13,8 +13,13 @@ module AuroraBootstrapper
 
     def export!
       database_names.all? do | database_name |
-        database = Database.new database_name: database_name, client: @client, blacklisted_tables: @blacklisted_tables
-        database.export!( into_bucket: @export_bucket )
+        begin
+          database = Database.new database_name: database_name, client: @client, blacklisted_tables: @blacklisted_tables
+          database.export!( into_bucket: @export_bucket )
+        rescue => e
+          AuroraBootstrapper.logger.error e
+          Rollbar.error(e)
+        end
       end
     end
 

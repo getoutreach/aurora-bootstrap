@@ -1,4 +1,6 @@
 require "logger"
+require 'rollbar'
+require 'multi_json'
 require "json"
 
 module AuroraBootstrapper
@@ -16,4 +18,8 @@ module AuroraBootstrapper
   end
 
   self.logger = ::Logger.new( STDOUT )
+
+  Rollbar.configure do |config|
+    config.access_token = ENV.fetch "ROLLBAR_TOKEN"
+  end
 end

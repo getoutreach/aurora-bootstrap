@@ -19,6 +19,7 @@ module AuroraBootstrapper
           end
         rescue => e
           AuroraBootstrapper.logger.error e
+          Rollbar.error(e)
         end
       end
     end
