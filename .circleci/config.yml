@@ -28,7 +28,7 @@ jobs:
       - run:
           name: Database Setup
           command: |
-            mysql -h localhost -uroot -proot < ./test/sql/user.sql ; mysql -uroot -proot < ./test/sql/drop.sql ; mysql -uroot -proot < ./test/sql/fixtures.sql
+            mysql -h 127.0.0.1 -uroot -proot < ./test/sql/user.sql ; mysql -uroot -proot < ./test/sql/drop.sql ; mysql -uroot -proot < ./test/sql/fixtures.sql
 
       - run:
           name: Run tests
