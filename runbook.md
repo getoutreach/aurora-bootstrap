@@ -35,7 +35,9 @@ The container needs to know what to connect to and the way the script works is i
 * `DB_HOST`: The *CLONED* host to run the script against.
 * `DB_USER`: The user of the host allowed to run `SELECT OUTFILE INTO S3` against all the databases
 * `DB_PASS`: The password for `DB_USER`
-* `PPREFIX`[optional]: The prefix for databases to be scanned. So, like, if you name all your databases `fun_objects`, `fun_properties`, etc, you would set the `PREFIX` to be `fun` and the bootstrapper will omit any on-prefixed databases. Helpful if you don't want to export `information_schema`, `performance_schema` and `innodb`
+* `PPREFIX`*[optional]*: The prefix for databases to be scanned. So, like, if you name all your databases `fun_objects`, `fun_properties`, etc, you would set the `PREFIX` to be `fun` and the bootstrapper will omit any on-prefixed databases. Helpful if you don't want to export `information_schema`, `performance_schema` and `innodb`
+* `EXPORT_BUCKET`: The name of the bucket into which the CSV will go
+* `BLACKLISTED_TABLES`*[optional]*: If you want to omit tables, you can list them here in a comma separated format. We support db-agnostic tables (e.g. `super_sensitive_data` will be ignored in every db scanned) as well as db-specific(e.g. `users.photos` will only ignore `photos` in the `users` database, but nowhere else (`kittens.photos` will still backfill))
 
 ## Run the converter
 
@@ -49,6 +51,9 @@ The exporter needs to know what data to process and where to process it into. It
 
 * `INPUT_CSV_PATH`: the full `s3://bukkit/path/to/source/parent/dir` of the directory that will be recursively converted.
 * `EXPORT_JSON_PATH`: the full `s3://bukkit/path/to/target/parent/dir` of the directory that will receive all the converted files with identical directory strucuture as the source
+* `TABLES`: list of tables to be converted in a spaceless CSV `database.table` format.
+* `AWS_ACCESS_KEY_ID`: AWS access key id for auth to both buckets
+* `AWS_SECRET_ACCESS_KEY`: AWS secret access key for auth to both buckets
 
 ## Delete the clone
 

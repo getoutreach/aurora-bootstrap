@@ -1,25 +1,37 @@
 module AuroraBootstrapper
   class Converter
-    def initialize( out_of_csv_bucket:, into_json_bucket:, table: )
-      @out_bucket = out_of_csv_bucket
-      @in_bucket  = into_json_bucket
-      @table      = table
-      @client     = Aws::S3::Client.new
+
+    def initialize( out_of_csv_bucket:, into_json_bucket:, tables:, client: )
+      @out_of_csv_bucket = out_of_csv_bucket
+      @into_json_bucket  = into_json_bucket
+      @tables            = tables.split(",")
+      @client            = client
     end
 
-    def part_urls
-      @manifest_json[ "entries" ].map do | entry |
-        entry[ "url" ]
+    def convert!
+      @tables.each do | table |
+        begin
+          # convert from database.table to database/table notation
+          table      = table.gsub ".", "/"
+          chunk_part = 0
+          CsvParser.new( bucket: @out_of_csv_bucket, table: table, client: @client ).read do | rows |
+            write payload: rows.to_json, name: "#{table}.#{chunk_part}.json"
+            chunk_part += 1
+          end
+        rescue => e
+          AuroraBootstrapper.logger.error message: "Error in converting #{@out_of_csv_bucket}/#{@table}", error: e
+        end
       end
     end
 
-    def manifest_json
-      @manifest_json ||= JSON.parse( @client.get_object bucket: @out_bucket
-                                                      key: "#{@table}.manifest" )
+
+    def write( payload:, name: )
+      AuroraBootstrapper.logger.info message: "Writing to #{@into_json_bucket}/#{name}"
+
+      @client.put_object( acl: "authenticated-read", 
+                         body: payload, 
+                       bucket: @into_json_bucket, 
+                          key: name )
     end
-
-    def convert
-      part_urls.each do | url |
-
   end
 end

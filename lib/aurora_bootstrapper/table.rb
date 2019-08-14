@@ -33,7 +33,7 @@ module AuroraBootstrapper
           UNION ALL
         SELECT #{ fields.join(', ') }
           FROM #{ @database_name }.#{ @table_name }
-        INTO OUTFILE S3 '#{ into_bucket }'
+        INTO OUTFILE S3 '#{ into_bucket }/#{ @database_name }/#{ @table_name }'
           FIELDS TERMINATED BY '#{ AuroraBootstrapper::COL_DELIMITER }'
           LINES TERMINATED BY '#{ AuroraBootstrapper::ROW_DELIMITER }'
           MANIFEST ON

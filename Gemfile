@@ -2,7 +2,15 @@ source 'https://rubygems.org'
 
 gem 'rake'
 gem 'zeitwerk'
+
+# exporter
 gem 'mysql2'
+
+# converter
+gem 'aws-sdk-s3'
+
+gem 'rollbar'
+gem 'multi_json'
 
 group :development, :test do
   gem 'minitest'

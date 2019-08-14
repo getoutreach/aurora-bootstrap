@@ -1,23 +1,24 @@
+require 'mysql2'
+
 module AuroraBootstrapper
   class Exporter
     attr_reader :client
 
-    def initialize( db_host:, db_user:, db_pass:, prefix: "", export_bucket:, blacklisted_tables: "" )
-      @db_host            = db_host
-      @db_user            = db_user
-      @db_pass            = db_pass
+    def initialize( client:, prefix: "", export_bucket:, blacklisted_tables: "" )
       @match              = "#{prefix}.*"
       @export_bucket      = export_bucket
       @blacklisted_tables = blacklisted_tables.split(",")
-      @client  = Mysql2::Client.new(     host: db_host,
-                                     username: db_user,
-                                     password: db_pass)
+      @client             = client
     end
 
     def export!
       database_names.all? do | database_name |
-        database = Database.new database_name: database_name, client: @client, blacklisted_tables: @blacklisted_tables
-        database.export!( into_bucket: @export_bucket )
+        begin
+          database = Database.new database_name: database_name, client: @client, blacklisted_tables: @blacklisted_tables
+          database.export! into_bucket: @export_bucket
+        rescue => e
+          AuroraBootstrapper.logger.error message: "Error in database #{database_name}", error: e
+        end
       end
     end
 
@@ -28,6 +29,9 @@ module AuroraBootstrapper
                             end.select do | database_name |
                               database_name.match @match
       end
+    rescue => e
+      AuroraBootstrapper.logger.fatal message: "Error getting databases", error: e
+      []
     end
   end
 end
