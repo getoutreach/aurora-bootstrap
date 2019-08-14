@@ -24,20 +24,11 @@ jobs:
       - run:
           name: Database Setup
           command: |
-            mysql -uroot -proot << ./test/sql/user.sql ;\
-            mysql -uroot -proot << ./test/sql/drop.sql ;\
-            mysql -uroot -proot << ./test/sql/fixtures.sql
+            mysql -uroot -proot << ./test/sql/user.sql ; mysql -uroot -proot << ./test/sql/drop.sql ; mysql -uroot -proot << ./test/sql/fixtures.sql
 
       - run:
           name: Run tests
           command: rake
-
-      # collect reports
-      - store_test_results:
-          path: /tmp/test-results
-      - store_artifacts:
-          path: /tmp/test-results
-          destination: test-results
 
 workflows:
   version: 2
