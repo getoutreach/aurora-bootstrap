@@ -9,6 +9,7 @@ services:
   - mysql
 
 before_install:
+  - mysql < ./test/sql/user.sql
   - mysql < ./test/sql/drop.sql
   - mysql < ./test/sql/fixtures.sql
   - gem install bundler -v 1.17.3
