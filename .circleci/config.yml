@@ -23,7 +23,7 @@ jobs:
 
       - run:
           name: Install SQL client
-          command: bundle install mysql-client
+          command: sudo apt-get install mysql-client
 
       - run:
           name: Database Setup
