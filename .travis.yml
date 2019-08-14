@@ -1,0 +1,14 @@
+language: ruby
+rvm:
+  - 2.6.0
+
+services:
+  - mysql
+
+before_install:
+  - mysql < `cat ./test/sql/drop.sql`
+  - mysql < `cat ./test/sql/fixtures.sql`
+  - gem install bundler -v 1.17.3
+  - bundle install
+
+script: rake
