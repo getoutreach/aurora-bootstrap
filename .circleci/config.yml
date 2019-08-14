@@ -6,29 +6,38 @@ jobs:
     docker:
       - image: circleci/ruby:2.6.0
     
-      - image: mysql/mysql-server:5.7
-        command: --default-authentication-plugin=mysql_native_password
-        ports:
-          - "3306:3306"
+      - image: circleci/mysql:8.0.4
         environment:
-          - MYSQL_ROOT_PASSWORD=root
-        
+          MYSQL_ROOT_PASSWORD: rootpw
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: user
+          MYSQL_PASSWORD: passw0rd
+
     steps:
       - checkout
-
-      # Bundle install dependencies
+      - run:
+      # Our primary container isn't MYSQL so run a sleep command until it's ready.
+          name: Waiting for MySQL to be ready
+          command: |
+            for i in `seq 1 10`;
+            do
+              nc -z 127.0.0.1 3306 && echo Success && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo Failed waiting for MySQL && exit 1
+      - run:
+          name: Install MySQL CLI; Import dummy data
+          command: |
+            sudo apt-get install default-mysql-client
+            mysql -h 127.0.0.1 -uroot -proot < ./test/sql/user.sql
+            mysql -h 127.0.0.1 -uroot -proot < ./test/sql/drop.sql
+            mysql -h 127.0.0.1 -uroot -proot < ./test/sql/fixtures.sql
+            
+        
       - run:
           name: Install dependencies
-          command: bundle install
-
-      - run:
-          name: Install SQL client
-          command: sudo apt-get install mysql-client
-
-      - run:
-          name: Database Setup
-          command: |
-            mysql -h 127.0.0.1 -uroot -proot < ./test/sql/user.sql ; mysql -uroot -proot < ./test/sql/drop.sql ; mysql -uroot -proot < ./test/sql/fixtures.sql
+          command: bundle install      
 
       - run:
           name: Run tests
