@@ -25,7 +25,7 @@ class ExporterTest < Minitest::Test
                                                             prefix: "",
                                                      export_bucket: @bukkit )
 
-    assert_equal [ "information_schema", "master", "mysql", "performance_schema", "sys", "user_properties", "user_stuff" ], everything_exporter.database_names
+    assert_empty [ "information_schema", "master", "mysql", "performance_schema", "sys", "user_properties", "user_stuff" ] - everything_exporter.database_names
   end
 
   def test_database_names_logs_on_bad_connection
