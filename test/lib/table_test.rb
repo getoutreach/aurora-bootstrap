@@ -62,9 +62,9 @@ class TableTest < Minitest::Test
   def test_blacklisted_fields
     table = table_with_blacklist( ["first_name", "users.last_name", "master.users.email"] )
     
-    assert table.blacklisted_field?( "email" )
     assert table.blacklisted_field?( "first_name" )
     assert table.blacklisted_field?( "last_name" )
+    assert table.blacklisted_field?( "email" )
   end
 
   def test_blacklisted_fields_with_regexps 
@@ -73,6 +73,21 @@ class TableTest < Minitest::Test
     assert table.blacklisted_field?( "email" )
     assert table.blacklisted_field?( "first_name" )
     assert table.blacklisted_field?( "last_name" )    
+  end
+
+  def test_blacklisting_fields_across_tables
+    blacklisted_fields = [ '/pho.*.link/', 'user_id' ]
+
+    tables = [ AuroraBootstrapper::Table.new( database_name: "user_stuff",
+                                                 table_name: "photos",
+                                                     client: @client,
+                                         blacklisted_fields: blacklisted_fields ),
+
+               AuroraBootstrapper::Table.new( database_name: "user_stuff",
+                                                 table_name: "websites",
+                                                     client: @client,
+                                         blacklisted_fields: blacklisted_fields ) ]
+    assert_equal [["id"], ["id", "link"]], tables.map(&:fields)
   end
 
   def test_export
