@@ -13,9 +13,9 @@ class TableTest < Minitest::Test
     @exporter = AuroraBootstrapper::Exporter.new( client: @client,
                                                   prefix: @prefix,
                                            export_bucket: @bukkit )
-    @table     = AuroraBootstrapper::Table.new database_name: "master",
-                                                  table_name: "users",
-                                                      client: @client
+    @table    = AuroraBootstrapper::Table.new database_name: "master",
+                                                 table_name: "users",
+                                                     client: @client
   end
 
   def test_fields
@@ -44,7 +44,7 @@ class TableTest < Minitest::Test
   def test_export_logs
     with_logger PutsLogger.new do
 
-      assert_output /Export failed:/ do
+      assert_output( /Export failed:/ ) do
         @table.export!( into_bucket: "s3://bukkit")
       end
 
@@ -53,10 +53,26 @@ class TableTest < Minitest::Test
 
       @client.stubs( :query ).returns( "yay" )
       
-      assert_output /Export succeeded: / do
+      assert_output( /Export succeeded: / ) do
         assert @table.export!( into_bucket: "s3://bukkit")
       end
     end
+  end
+
+  def test_blacklisted_fields
+    table = table_with_blacklist( ["first_name", "users.last_name", "master.users.email"] )
+    
+    assert table.blacklisted_field?( "email" )
+    assert table.blacklisted_field?( "first_name" )
+    assert table.blacklisted_field?( "last_name" )
+  end
+
+  def test_blacklisted_fields_with_regexps 
+    table = table_with_blacklist( ["/first.*/", "/users.last.*/", "/*.users.email/"] )
+    
+    assert table.blacklisted_field?( "email" )
+    assert table.blacklisted_field?( "first_name" )
+    assert table.blacklisted_field?( "last_name" )    
   end
 
   def test_export
@@ -68,5 +84,14 @@ class TableTest < Minitest::Test
       assert @exporter.export!
 
     end
+  end
+
+  private
+
+  def table_with_blacklist( blacklisted_fields )
+    AuroraBootstrapper::Table.new database_name: "master",
+                                     table_name: "users",
+                                         client: @client,
+                             blacklisted_fields: blacklisted_fields
   end
 end

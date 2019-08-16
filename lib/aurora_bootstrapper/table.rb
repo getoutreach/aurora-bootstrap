@@ -1,14 +1,46 @@
 module AuroraBootstrapper
   class Table
-    def initialize( database_name:, table_name:, client: )
-      @database_name = database_name
-      @table_name    = table_name
-      @client        = client
+    def initialize( database_name:, table_name:, client:, blacklisted_fields: [] )
+      @blacklisted_fields = blacklisted_fields
+      @database_name      = database_name
+      @table_name         = table_name
+      @client             = client
     end
 
     def fields
       @fields ||= @client.query("DESC #{ @database_name }.#{ @table_name }").map do | row |
         row[ "Field" ]
+      end.reject do | field |
+        blacklisted_field?( field )
+      end
+    end
+
+    def blacklisted_field?( field )
+      @blacklisted_fields.any? do | blacklisted_field |
+        # blacklisted fields can be in the format of "field", "table.field" or "database.table.field"
+
+        bl_field_name    = blacklisted_field
+        bl_table_name    = @table_name
+        bl_database_name = @database_name
+
+
+        if blacklisted_field.match( /\/.*\// )
+          regexp         = blacklisted_field.slice(1...-1)
+          qualified_name = "#{@database_name}.#{@table_name}.#{field}"
+
+          bl_field_name  = qualified_name.match( /#{regexp}/ ) ? field : false
+
+        elsif blacklisted_field.match( /[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+/ )
+          bl_database_name, bl_table_name, bl_field_name = blacklisted_field.split(".")
+
+        elsif blacklisted_field.match( /[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+/ )
+          bl_table_name, bl_field_name = blacklisted_field.split(".")
+          bl_database_name             = @database_name
+        end
+
+        bl_field_name    == field &&
+        bl_table_name    == @table_name &&
+        bl_database_name == @database_name
       end
     end
 
