@@ -33,12 +33,18 @@ module AuroraBootstrapper
         bl_table_name    = blacklisted_table
         bl_database_name = @database_name
 
-        if blacklisted_table.match( /[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+/ )
+        if blacklisted_table.match( /\/.*\// )
+          regexp         = blacklisted_table.slice(1...-1)
+          qualified_name = "#{@database_name}.#{table_name}"
+
+          bl_table_name  = qualified_name.match( /#{regexp}/ ) ? table_name : false
+        
+        elsif blacklisted_table.match( /[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+/ )
           bl_database_name, bl_table_name = blacklisted_table.split(".")
         end
 
-        table_name.match( /#{bl_table_name}/ ) &&
-        @database_name.match( /#{bl_database_name}/ )
+        bl_table_name    == table_name &&
+        bl_database_name == @database_name
       end
     end
   end

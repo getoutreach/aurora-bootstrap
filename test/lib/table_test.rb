@@ -68,7 +68,7 @@ class TableTest < Minitest::Test
   end
 
   def test_blacklisted_fields_with_regexps 
-    table = table_with_blacklist( ["/first.*/", "/users.last.*/", "/*.users.email/"] )
+    table = table_with_blacklist( ["/first.*/", "/users.last.*/", "/.*.users.email/"] )
     
     assert table.blacklisted_field?( "email" )
     assert table.blacklisted_field?( "first_name" )
