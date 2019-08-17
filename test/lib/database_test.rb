@@ -42,6 +42,18 @@ class DatabaseTest < Minitest::Test
     assert_equal [ "avatars" ], properties_database.table_names
   end
 
+  def test_regexp_blacklisted_tables
+    blacklist           = ["master.websites", "/.*sensitive.*/"]
+    master_database     = AuroraBootstrapper::Database.new database_name: "master", client: @client, blacklisted_tables: blacklist
+    properties_database = AuroraBootstrapper::Database.new database_name: "user_properties", client: @client, blacklisted_tables: blacklist
+    stuff_database      = AuroraBootstrapper::Database.new database_name: "user_stuff", client: @client, blacklisted_tables: blacklist
+
+
+    assert_equal [ "users" ], master_database.table_names
+    assert_equal [ "photos", "websites" ], stuff_database.table_names
+    assert_equal [ "avatars" ], properties_database.table_names
+  end
+
   def test_export_calls_table
     mock = Minitest::Mock.new
     mock.expect :export!, nil

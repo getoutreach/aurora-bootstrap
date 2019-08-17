@@ -4,9 +4,10 @@ require 'zeitwerk'
 require 'mysql2'
 require_relative "../lib/aurora_bootstrapper"
 
-prefix    = ENV.fetch "PREFIX", ""
-bukkit    = ENV.fetch "EXPORT_BUCKET"
-blacklist = ENV.fetch "BLACKLISTED_TABLES", ""
+prefix             = ENV.fetch "PREFIX", ""
+bukkit             = ENV.fetch "EXPORT_BUCKET"
+blacklisted_tables = ENV.fetch "BLACKLISTED_TABLES", ""
+blacklisted_fields = ENV.fetch "BLACKLISTED_FIELDS", ""
 
 client    = Mysql2::Client.new( host: ENV.fetch( "DB_USER" ),
                             username: ENV.fetch( "DB_PASS" ),
@@ -15,4 +16,5 @@ client    = Mysql2::Client.new( host: ENV.fetch( "DB_USER" ),
 AuroraBootstrapper::Exporter.new( client: client,
                                   prefix: prefix,
                            export_bucket: bukkit,
-                      blacklisted_tables: blacklist ).export!
+                      blacklisted_tables: blacklisted_tables,
+                      blacklisted_fields: blacklisted_fields ).export!

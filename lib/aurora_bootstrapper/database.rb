@@ -1,8 +1,9 @@
 module AuroraBootstrapper
   class Database
-    def initialize( database_name:, client:, blacklisted_tables: [] )
+    def initialize( database_name:, client:, blacklisted_tables: [], blacklisted_fields: [] )
       @database_name      = database_name
       @blacklisted_tables = blacklisted_tables
+      @blacklisted_fields = blacklisted_fields
       @client             = client
     end
 
@@ -16,7 +17,11 @@ module AuroraBootstrapper
 
     def export!( into_bucket )
       table_names.all? do | table_name |
-        table = Table.new database_name: @database_name, table_name: table_name, client: @client
+        table = Table.new database_name: @database_name,
+                             table_name: table_name,
+                                 client: @client,
+                     blacklisted_fields: @blacklisted_fields
+
         table.export!( into_bucket: into_bucket )
       end
     end
@@ -25,17 +30,19 @@ module AuroraBootstrapper
       @blacklisted_tables.any? do | blacklisted_table |
         # blacklisted tables can be in the format of "table" or "database.table"
         
-        # the table name will always be the last thing in the split array
-        bl_table_name    = blacklisted_table.split(".").last
+        bl_table_name    = blacklisted_table
+        bl_database_name = @database_name
 
-        # if the blacklisted table has a db specifier ('.'' in the name)
-        bl_database_name = blacklisted_table.match( /\./ ) ?
-                              # then we take the fist part of the name
-                              blacklisted_table.split(".").first :
-                              # otherwise it will be true for every db
-                              # we take the current db name to ensure a match
-                              @database_name
+        if blacklisted_table.match( /\/.*\// )
+          regexp         = blacklisted_table.slice(1...-1)
+          qualified_name = "#{@database_name}.#{table_name}"
+
+          bl_table_name  = qualified_name.match( /#{regexp}/ ) ? table_name : false
         
+        elsif blacklisted_table.match( /[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+/ )
+          bl_database_name, bl_table_name = blacklisted_table.split(".")
+        end
+
         bl_table_name    == table_name &&
         bl_database_name == @database_name
       end
