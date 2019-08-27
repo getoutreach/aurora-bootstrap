@@ -1,0 +1,11 @@
+#! /bin/bash
+
+VERSION=`cat version`
+TAG="gaorlov/aurora-bootstrap:${VERSION}"
+
+echo ---- building ${TAG} ----
+docker build . -t ${TAG}
+
+
+echo ---- building ${TAG} ----
+docker push ${TAG}
