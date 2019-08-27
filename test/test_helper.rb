@@ -1,4 +1,5 @@
 $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
+require "zeitwerk"
 require 'simplecov'
 require 'dotenv'
 require 'mysql2'
@@ -99,6 +100,11 @@ module Gls
   end
 end
 
-require_relative "../lib/aurora_bootstrapper"
+loader = Zeitwerk::Loader.new
+loader.log!
+loader.push_dir( File.expand_path( "../../lib/", __FILE__) )
+loader.setup
+loader.eager_load
+
 require "minitest/autorun"
 require "mocha/minitest"

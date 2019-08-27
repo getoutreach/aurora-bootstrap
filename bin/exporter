@@ -1,8 +1,13 @@
 #!/usr/bin/env ruby
 
-require 'zeitwerk'
 require 'mysql2'
-require_relative "../lib/aurora_bootstrapper"
+
+require "zeitwerk"
+loader = Zeitwerk::Loader.new
+loader.log!
+loader.push_dir( File.expand_path( "../../lib/", __FILE__) )
+loader.setup
+loader.eager_load
 
 prefix             = ENV.fetch "PREFIX", ""
 bukkit             = ENV.fetch "EXPORT_BUCKET"

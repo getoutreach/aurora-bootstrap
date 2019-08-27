@@ -2,7 +2,12 @@
 
 require 'zeitwerk'
 require 'aws-sdk-s3'
-require_relative "../lib/aurora_bootstrapper"
+require "zeitwerk"
+loader = Zeitwerk::Loader.new
+loader.log!
+loader.push_dir( File.expand_path( "../../lib/", __FILE__) )
+loader.setup
+loader.eager_load
 
 out_of_csv_bucket = ENV.fetch "INPUT_CSV_PATH"
 into_json_bucket  = ENV.fetch "EXPORT_JSON_PATH"
