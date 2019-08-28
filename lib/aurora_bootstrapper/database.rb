@@ -8,14 +8,14 @@ module AuroraBootstrapper
     end
 
     def table_names
-      @table_names ||= @client.query( "SHOW TABLES IN #{@database_name}" ).map do | row |
+      @table_names ||= @client.query( "SHOW TABLES IN `#{@database_name}`" ).map do | row |
         row[ "Tables_in_#{@database_name}" ]
       end.reject do | table_name |
         blacklisted_table?( table_name )
       end
     end
 
-    def export!( into_bucket )
+    def export!( into_bucket: )
       table_names.all? do | table_name |
         table = Table.new database_name: @database_name,
                              table_name: table_name,

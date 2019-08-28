@@ -1,12 +1,11 @@
-FROM ruby:2.6.0
+FROM ruby:2.6
 
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends default-libmysqlclient-dev default-mysql-client
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 COPY Gemfile /usr/src/app/
 COPY Gemfile.lock /usr/src/app/
-COPY vendor /usr/src/app/vendor
-
-RUN gem install bundler -v 1.17.3
 
 RUN bundle install --path vendor/cache --without test
 

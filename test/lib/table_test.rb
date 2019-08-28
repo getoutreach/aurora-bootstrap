@@ -31,7 +31,7 @@ class TableTest < Minitest::Test
       SELECT 'id', 'email', 'first_name', 'last_name'
         UNION ALL
       SELECT id, email, first_name, last_name
-        FROM master.users
+        FROM `master`.`users`
       INTO OUTFILE S3 's3://bukkit/master/users'
         FIELDS TERMINATED BY 'AURORA-BOOTSTRAP-EXPORT-COL-DELIMITER'
         LINES TERMINATED BY 'AURORA-BOOTSTRAP-EXPORT-ROW-DELIMITER'
@@ -44,7 +44,7 @@ class TableTest < Minitest::Test
   def test_export_logs
     with_logger PutsLogger.new do
 
-      assert_output( /Export failed:/ ) do
+      assert_output( /Export statement/ ) do
         @table.export!( into_bucket: "s3://bukkit")
       end
 

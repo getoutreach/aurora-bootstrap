@@ -25,7 +25,7 @@ module AuroraBootstrapper
         error   = args[ :error ]
 
         @logger.send severity, "#{message}: #{error}"
-        rollbar severity, args
+        rollbar severity, message: message, error: error
       end
     end
 

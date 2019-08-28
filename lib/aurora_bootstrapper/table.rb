@@ -50,12 +50,18 @@ module AuroraBootstrapper
       end.join(', ')
     end
 
+    def select_fields
+      fields.map do | field |
+        "`#{field}`"
+      end.join(', ')
+    end
+
     def export!( into_bucket: )
       result = @client.query( export_statement( into_bucket: into_bucket ) )
-      AuroraBootstrapper.logger.info( "Export succeeded: #{result.inspect}" )
+      AuroraBootstrapper.logger.info( message:"Export succeeded: #{@database_name}.#{@table_name}" )
       true
     rescue => e
-      AuroraBootstrapper.logger.fatal( "Export failed: #{e}" )
+      AuroraBootstrapper.logger.fatal( mesasge: "Export statement '#{export_statement( into_bucket: into_bucket )}' failed", error: e )
       false
     end
 
@@ -63,8 +69,8 @@ module AuroraBootstrapper
       <<~SQL
         SELECT #{ fields_row }
           UNION ALL
-        SELECT #{ fields.join(', ') }
-          FROM #{ @database_name }.#{ @table_name }
+        SELECT #{ select_fields }
+          FROM `#{ @database_name }`.`#{ @table_name }`
         INTO OUTFILE S3 '#{ into_bucket }/#{ @database_name }/#{ @table_name }'
           FIELDS TERMINATED BY '#{ AuroraBootstrapper::COL_DELIMITER }'
           LINES TERMINATED BY '#{ AuroraBootstrapper::ROW_DELIMITER }'
