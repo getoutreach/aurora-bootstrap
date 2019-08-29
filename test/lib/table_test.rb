@@ -28,9 +28,7 @@ class TableTest < Minitest::Test
 
   def test_export_statement
     expected = <<~SQL
-      SELECT 'id', 'email', 'first_name', 'last_name'
-        UNION ALL
-      SELECT id, email, first_name, last_name
+      SELECT JSON_OBJECT( 'database', 'outreach_staging_outreach', 'table', 'events', 'type', 'backfill', 'ts', unix_timestamp(), 'data', JSON_OBJECT('id', `id`, 'email', `email`, 'first_name', `first_name`, 'last_name', `last_name` ) )
         FROM `master`.`users`
       INTO OUTFILE S3 's3://bukkit/master/users'
         FIELDS TERMINATED BY 'AURORA-BOOTSTRAP-EXPORT-COL-DELIMITER'

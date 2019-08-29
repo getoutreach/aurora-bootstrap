@@ -56,6 +56,10 @@ module AuroraBootstrapper
       end.join(', ')
     end
 
+    def json_object
+      "JSON_OBJECT( 'database', 'outreach_staging_outreach', 'table', 'events', 'type', 'backfill', 'ts', unix_timestamp(), 'data', JSON_OBJECT(#{ fields.map{ | field | "'#{field}', `#{field}`" }.join(', ') } ) )"
+    end
+
     def export!( into_bucket: )
       result = @client.query( export_statement( into_bucket: into_bucket ) )
       AuroraBootstrapper.logger.info( message:"Export succeeded: #{@database_name}.#{@table_name}" )
@@ -67,9 +71,7 @@ module AuroraBootstrapper
 
     def export_statement( into_bucket: )
       <<~SQL
-        SELECT #{ fields_row }
-          UNION ALL
-        SELECT #{ select_fields }
+        SELECT #{ json_object }
           FROM `#{ @database_name }`.`#{ @table_name }`
         INTO OUTFILE S3 '#{ into_bucket }/#{ @database_name }/#{ @table_name }'
           FIELDS TERMINATED BY '#{ AuroraBootstrapper::COL_DELIMITER }'
