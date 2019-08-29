@@ -7,9 +7,6 @@ gem 'zeitwerk'
 gem 'connection_pool'
 gem 'mysql2'
 
-# converter
-gem 'aws-sdk-s3'
-
 gem 'rollbar'
 gem 'multi_json'
 

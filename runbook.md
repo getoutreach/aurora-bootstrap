@@ -10,19 +10,13 @@ Clone your database as described in the docs [here](https://docs.aws.amazon.com/
 
 The buckets you will need to set up: 
 
-* CSV bucket: This is the bucket where the initial CSV export
-* JSON bucket: The bucket into which we will put the converted JSON
+* JSON bucket: This is the bucket where the JSON will export
 
 ## Set up permissions
 
 Since the data can be sensitive, we should be sure to have a limited set of permissions for the buckets and the Aurora clusters.
 
-There need to be 4 sets of permissions:
-
-* Auroa exporter: the `SELECT INTO OUTFILE S3` statement requires permissions described [here](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Integrating.Authorizing.IAM.S3CreatePolicy.html)
-* CSV exporter: The exporter job needs access to Aurora. This may not be necessary inside K8s, but somehting to investigate.
-* CSV-to-JSON formatter: the formatter will need list, and read premissions to the CSV bucket; and list, read, and writer persmissions to the JSON bucket
-* JSON bucket reader: this bucket will contain sensitive data and needs to have limited permissions.
+All we have to do is set up the Aurora permissions for the `SELECT INTO OUTFILE S3` statement requires permissions described [here](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Integrating.Authorizing.IAM.S3CreatePolicy.html)
   
 ## Run the exporter
 
@@ -39,22 +33,6 @@ The container needs to know what to connect to and the way the script works is i
 * `EXPORT_BUCKET`: The name of the bucket into which the CSV will go
 * `BLACKLISTED_TABLES`*[optional]*: If you want to omit tables, you can list them here in a comma separated format. We support db-agnostic tables (e.g. `super_sensitive_data` will be ignored in every db scanned) as well as db-specific(e.g. `users.photos` will only ignore `photos` in the `users` database, but nowhere else (`kittens.photos` will still backfill)). You can also specify the tables in a regular expression starting and wnding with a `/` (e.g. `/.*password.*/` will filter out any table with `password` in its or its database's name)
 * `BLACKLISTED_FIELDS`*[optional]*: Similarly to the table blacklisting, if you wanted to blacklist fields, you can list them in the same format as the tables, including the regexp.
-
-## Run the converter
-
-Once the export is completed and your CSV is all good to go, you will need to convert that raw data into consumable JSON.
-
-*NOTE*: The converter will run against the specified folder and all subfolders.
-
-### Env vars
-
-The exporter needs to know what data to process and where to process it into. It gets the values from the env. Here's what you need to set up:
-
-* `INPUT_CSV_PATH`: the full `s3://bukkit/path/to/source/parent/dir` of the directory that will be recursively converted.
-* `EXPORT_JSON_PATH`: the full `s3://bukkit/path/to/target/parent/dir` of the directory that will receive all the converted files with identical directory strucuture as the source
-* `TABLES`: list of tables to be converted in a spaceless CSV `database.table` format.
-* `AWS_ACCESS_KEY_ID`: AWS access key id for auth to both buckets
-* `AWS_SECRET_ACCESS_KEY`: AWS secret access key for auth to both buckets
 
 ## Delete the clone
 

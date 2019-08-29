@@ -29,7 +29,9 @@ module AuroraBootstrapper
     def rollbar( severity, error:, message: )
       rollbar_severity = ROLLBAR_SEVERITY[ severity ]
 
-      Rollbar.send rollbar_severity, error, message
+      unless rollbar_severity.nil?
+        Rollbar.send rollbar_severity, error, message
+      end
     end
   end
 end

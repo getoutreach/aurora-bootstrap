@@ -44,16 +44,8 @@ module AuroraBootstrapper
       end
     end
 
-    def fields_row
-      fields.map do | field |
-        "'#{field}'"
-      end.join(', ')
-    end
-
-    def select_fields
-      fields.map do | field |
-        "`#{field}`"
-      end.join(', ')
+    def json_object
+      "JSON_OBJECT( 'database', '#{@database_name}', 'table', '#{@table_name}', 'type', 'backfill', 'ts', unix_timestamp(), 'data', JSON_OBJECT(#{ fields.map{ | field | "'#{field}', `#{field}`" }.join(', ') } ) )"
     end
 
     def export!( into_bucket: )
@@ -67,13 +59,9 @@ module AuroraBootstrapper
 
     def export_statement( into_bucket: )
       <<~SQL
-        SELECT #{ fields_row }
-          UNION ALL
-        SELECT #{ select_fields }
+        SELECT #{ json_object }
           FROM `#{ @database_name }`.`#{ @table_name }`
         INTO OUTFILE S3 '#{ into_bucket }/#{ @database_name }/#{ @table_name }'
-          FIELDS TERMINATED BY '#{ AuroraBootstrapper::COL_DELIMITER }'
-          LINES TERMINATED BY '#{ AuroraBootstrapper::ROW_DELIMITER }'
           MANIFEST ON
           OVERWRITE ON
       SQL

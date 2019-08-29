@@ -22,19 +22,16 @@ class TableTest < Minitest::Test
     assert_equal [ "id", "email", "first_name", "last_name" ], @table.fields
   end
 
-  def test_fields_row
-    assert_equal "'id', 'email', 'first_name', 'last_name'", @table.fields_row
+  def test_json_object
+    assert_equal "JSON_OBJECT( 'database', 'master', 'table', 'users', 'type', 'backfill', 'ts', unix_timestamp(), 'data', JSON_OBJECT('id', `id`, 'email', `email`, 'first_name', `first_name`, 'last_name', `last_name` ) )",
+                 @table.json_object
   end
 
   def test_export_statement
     expected = <<~SQL
-      SELECT 'id', 'email', 'first_name', 'last_name'
-        UNION ALL
-      SELECT id, email, first_name, last_name
+      SELECT JSON_OBJECT( 'database', 'master', 'table', 'users', 'type', 'backfill', 'ts', unix_timestamp(), 'data', JSON_OBJECT('id', `id`, 'email', `email`, 'first_name', `first_name`, 'last_name', `last_name` ) )
         FROM `master`.`users`
       INTO OUTFILE S3 's3://bukkit/master/users'
-        FIELDS TERMINATED BY 'AURORA-BOOTSTRAP-EXPORT-COL-DELIMITER'
-        LINES TERMINATED BY 'AURORA-BOOTSTRAP-EXPORT-ROW-DELIMITER'
         MANIFEST ON
         OVERWRITE ON
     SQL

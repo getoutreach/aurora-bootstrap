@@ -1,20 +1,25 @@
 # Bootstrapping Aurora to S3
 
-The fastest way we found to get full table data out of Aurora into S3 is to use the Aurora feature of `SELECT INTO OUTFILE S3`. This repo automates this process to some degree. There are 2 scripts and a runbook for them.
+The fastest way we found to get full table data out of Aurora into S3 is to use the Aurora feature of `SELECT INTO OUTFILE S3`. This repo automates this process to some degree.
 
-## Scripts
+## Exporter
 
-There's a couple scripts here that do the automated listing: the expoter and the converter.
+The expoter logs into the specified aurora instance, scans the databases, and their tables, and exports the lot into S3 in a newline separated JSON format that matches Maxwell's Daemon JSON format.
 
-### Exporter
+```json
+{ "database": "my_database",
+  "table": "my_table",
+  "type": "backfill",
+  "ts": 1567041664,
+  "data": {
+    "id": 1,
+    // ...etc.
+  }
+} 
 
-The expoter logs into the specified aurora instance, scans the databases, and their tables, and exports the lot into S3 in a CSV format.
+```
 
-### Converter
-
-The converter takes the exported CSV format and turns it into JSON in a different bucket.
-
-### Running tests
+## Running tests
 
 The tests run inside a dockerized db, so you will need to
 
