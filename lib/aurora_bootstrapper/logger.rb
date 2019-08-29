@@ -8,10 +8,7 @@ module AuroraBootstrapper
       config.access_token = ENV.fetch( 'ROLLBAR_TOKEN' )
     end
 
-    ROLLBAR_SEVERITY = { debug: :debug,
-                          info: :info,
-                          warn: :warning,
-                         error: :error,
+    ROLLBAR_SEVERITY = { error: :error,
                          fatal: :critical }
 
     

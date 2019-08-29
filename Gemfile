@@ -4,6 +4,7 @@ gem 'rake'
 gem 'zeitwerk'
 
 # exporter
+gem 'connection_pool'
 gem 'mysql2'
 
 # converter

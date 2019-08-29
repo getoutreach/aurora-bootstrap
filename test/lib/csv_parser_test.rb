@@ -101,5 +101,6 @@ class CsvParserTest < Minitest::Test
 
     assert_equal @parser.fields, rows.first.keys
     assert_equal 28, rows.count
+
   end
 end
