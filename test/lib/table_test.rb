@@ -23,13 +23,20 @@ class TableTest < Minitest::Test
   end
 
   def test_json_object
-    assert_equal "JSON_OBJECT( 'database', 'master', 'table', 'users', 'type', 'backfill', 'ts', unix_timestamp(), 'data', JSON_OBJECT('id', `id`, 'email', `email`, 'first_name', `first_name`, 'last_name', `last_name` ) )",
+    @table.stubs( :timestamp ).returns( "123" )
+    assert_equal "JSON_OBJECT( 'database', 'master', 'table', 'users', 'type', 'backfill', 'ts', 123, 'data', JSON_OBJECT('id', `id`, 'email', `email`, 'first_name', `first_name`, 'last_name', `last_name` ) )",
                  @table.json_object
   end
 
+  def test_timestamp
+    assert_equal Float, @table.timestamp.class
+  end
+
   def test_export_statement
+    @table.stubs( :timestamp ).returns( "123" )  
+
     expected = <<~SQL
-      SELECT JSON_OBJECT( 'database', 'master', 'table', 'users', 'type', 'backfill', 'ts', unix_timestamp(), 'data', JSON_OBJECT('id', `id`, 'email', `email`, 'first_name', `first_name`, 'last_name', `last_name` ) )
+      SELECT JSON_OBJECT( 'database', 'master', 'table', 'users', 'type', 'backfill', 'ts', 123, 'data', JSON_OBJECT('id', `id`, 'email', `email`, 'first_name', `first_name`, 'last_name', `last_name` ) )
         FROM `master`.`users`
       INTO OUTFILE S3 's3://bukkit/master/users'
         MANIFEST ON
@@ -40,13 +47,11 @@ class TableTest < Minitest::Test
 
   def test_export_logs
     with_logger PutsLogger.new do
+      @table.stubs( :timestamp ).returns( "123" )
 
       assert_output( /Export statement/ ) do
         @table.export!( into_bucket: "s3://bukkit")
       end
-
-      mock = Minitest::Mock.new
-      mock.expect :export!, nil
 
       @client.stubs( :query ).returns( "yay" )
       

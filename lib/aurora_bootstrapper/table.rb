@@ -44,8 +44,12 @@ module AuroraBootstrapper
       end
     end
 
+    def timestamp
+      @timestamp ||= @client.query( 'select ( unix_timestamp() - (select variable_value from information_schema.global_status where variable_name = "uptime" )  ) as time;').first['time']
+    end
+
     def json_object
-      "JSON_OBJECT( 'database', '#{@database_name}', 'table', '#{@table_name}', 'type', 'backfill', 'ts', unix_timestamp(), 'data', JSON_OBJECT(#{ fields.map{ | field | "'#{field}', `#{field}`" }.join(', ') } ) )"
+      "JSON_OBJECT( 'database', '#{@database_name}', 'table', '#{@table_name}', 'type', 'backfill', 'ts', #{timestamp}, 'data', JSON_OBJECT(#{ fields.map{ | field | "'#{field}', `#{field}`" }.join(', ') } ) )"
     end
 
     def export!( into_bucket: )

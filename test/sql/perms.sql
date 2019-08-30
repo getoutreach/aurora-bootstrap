@@ -1,0 +1,1 @@
+set @@global.show_compatibility_56=ON;

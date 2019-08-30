@@ -13,6 +13,7 @@ module AuroraBootstrapper
     end
 
     def export!
+      @client.query( "set sql_mode='NO_BACKSLASH_ESCAPES'" )
       database_names.all? do | database_name |
         begin
           database = Database.new database_name: database_name,
