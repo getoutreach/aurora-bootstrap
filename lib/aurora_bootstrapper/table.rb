@@ -45,7 +45,7 @@ module AuroraBootstrapper
     end
 
     def timestamp
-      @timestamp ||= @client.query( 'select ( unix_timestamp() - (select variable_value from information_schema.global_status where variable_name = "uptime" )  ) as time;').first['time']
+      @timestamp ||= @client.query( 'select ( unix_timestamp() - (select variable_value from information_schema.global_status where variable_name = "uptime" ) - 5000 ) as time;').first['time']
     end
 
     def json_object
