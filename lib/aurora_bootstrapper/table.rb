@@ -44,8 +44,12 @@ module AuroraBootstrapper
       end
     end
 
+    def timestamp
+      @timestamp ||= ENV.fetch( 'EPOCH_TIMESTAMP' ).to_i
+    end
+
     def json_object
-      "JSON_OBJECT( 'database', '#{@database_name}', 'table', '#{@table_name}', 'type', 'backfill', 'ts', unix_timestamp(), 'data', JSON_OBJECT(#{ fields.map{ | field | "'#{field}', `#{field}`" }.join(', ') } ) )"
+      "JSON_OBJECT( 'database', '#{@database_name}', 'table', '#{@table_name}', 'type', 'backfill', 'ts', #{timestamp}, 'data', JSON_OBJECT(#{ fields.map{ | field | "'#{field}', `#{field}`" }.join(', ') } ) )"
     end
 
     def export!( into_bucket: )

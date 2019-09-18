@@ -12,6 +12,7 @@ before_install:
   - mysql < ./test/sql/user.sql
   - mysql < ./test/sql/drop.sql
   - mysql < ./test/sql/fixtures.sql
+  - mysql < ./test/sql/perms.sql
   - gem install bundler -v 1.17.3
   - bundle install
 
