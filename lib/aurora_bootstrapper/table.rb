@@ -45,7 +45,7 @@ module AuroraBootstrapper
     end
 
     def timestamp
-      @timestamp ||= ENV.fetch( 'EPOCH_TIMESTAMP' ).to_i
+      @timestamp ||= 'unix_timestamp()'
     end
 
     def json_object
