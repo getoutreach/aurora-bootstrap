@@ -28,7 +28,7 @@ class TableTest < Minitest::Test
   end
 
   def test_timestamp
-    assert_equal Integer, @table.timestamp.class
+    assert_equal 'unix_timestamp()', @table.timestamp
   end
 
   def test_export_statement
