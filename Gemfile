@@ -9,10 +9,3 @@ gem 'mysql2'
 
 gem 'rollbar'
 gem 'multi_json'
-
-group :development, :test do
-  gem 'minitest'
-  gem 'simplecov'
-  gem 'mocha'
-  gem 'dotenv'
-end
