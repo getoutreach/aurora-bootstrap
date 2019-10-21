@@ -1,0 +1,6 @@
+.git
+coverage
+log/*
+.bundle
+Gemfile.test
+vendor
