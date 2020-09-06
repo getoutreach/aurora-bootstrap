@@ -16,4 +16,4 @@ before_install:
   - gem install bundler -v 1.17.3
   - bundle install --gemfile Gemfile.testing
 
-script: rake
+script: bundle exec --gemfile Gemfile.testing rake
