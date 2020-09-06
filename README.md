@@ -28,6 +28,8 @@ The tests run inside a dockerized db, so you will need to
 $ docker-compose up -d
 # load the fixtures into it
 $ ./bin/test_setup
+$ bundle install --gemfile=Gemfile.testing
+$ bundle exec --gemfile=Gemfile.testing rake test
 ```
 
 ## Runbook
