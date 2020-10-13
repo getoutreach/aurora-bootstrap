@@ -5,6 +5,7 @@ module AuroraBootstrapper
       @database_name      = database_name
       @table_name         = table_name
       @client             = client
+      @export_date        = ENV.fetch( 'EXPORT_DATE' )
     end
 
     def fields
@@ -65,7 +66,7 @@ module AuroraBootstrapper
       <<~SQL
         SELECT #{ json_object }
           FROM `#{ @database_name }`.`#{ @table_name }`
-        INTO OUTFILE S3 '#{ into_bucket }/#{ @database_name }/#{ @table_name }'
+        INTO OUTFILE S3 '#{ into_bucket }/#{ @export_date }/#{ @database_name }/#{ @table_name }'
           MANIFEST ON
           OVERWRITE ON
       SQL

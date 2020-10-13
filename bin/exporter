@@ -18,7 +18,8 @@ blacklisted_fields = ENV.fetch "BLACKLISTED_FIELDS", ""
 client    = ConnectionPool::Wrapper.new(size: 15, timeout: 3) do
               Mysql2::Client.new( host: ENV.fetch( "DB_HOST" ),
                               username: ENV.fetch( "DB_USER" ),
-                              password: ENV.fetch( "DB_PASS" ))
+                              password: ENV.fetch( "DB_PASS" ),
+                          init_command: "SET @@SESSION.MAX_EXECUTION_TIME=31536000")
             end
 
 AuroraBootstrapper::Exporter.new( client: client,

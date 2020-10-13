@@ -35,7 +35,7 @@ class TableTest < Minitest::Test
     expected = <<~SQL
       SELECT JSON_OBJECT( 'database', 'master', 'table', 'users', 'type', 'backfill', 'ts', unix_timestamp(), 'data', JSON_OBJECT('id', `id`, 'email', `email`, 'first_name', `first_name`, 'last_name', `last_name` ) )
         FROM `master`.`users`
-      INTO OUTFILE S3 's3://bukkit/master/users'
+      INTO OUTFILE S3 's3://bukkit/10-12-2020/master/users'
         MANIFEST ON
         OVERWRITE ON
     SQL
