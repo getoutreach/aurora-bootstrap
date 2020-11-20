@@ -15,11 +15,11 @@ class ExporterTest < Minitest::Test
   end
 
   def test_database_names
-    assert_equal [ "user_properties", "user_stuff" ], @exporter.database_names
+    assert_equal [ "user_name-test", "user_properties", "user_stuff" ], @exporter.database_names
   end
 
   def test_database_name_prefix
-    assert_equal [ "user_properties", "user_stuff" ], @exporter.database_names
+    assert_equal [ "user_name-test", "user_properties", "user_stuff" ], @exporter.database_names
 
     everything_exporter = AuroraBootstrapper::Exporter.new( client: @client,
                                                             prefix: "",
@@ -44,7 +44,7 @@ class ExporterTest < Minitest::Test
     with_puts_logger do
       AuroraBootstrapper::Database.any_instance.stubs( :table_names ).returns( 5 )
 
-      assert_output "{:message=>\"Error in database user_properties\", :error=>#<NoMethodError: undefined method `all?' for 5:Integer>}\n" do
+      assert_output "{:message=>\"Error in database user_name-test\", :error=>#<NoMethodError: undefined method `all?' for 5:Integer>}\n" do
         @exporter.export!
       end
     end
