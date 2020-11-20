@@ -58,6 +58,7 @@ class TableTest < Minitest::Test
         OVERWRITE ON
     SQL
     assert_equal expected, table.export_statement( into_bucket: "s3://bukkit")
+    ENV['EXPORT_DATE'] = "10-12-2020"
   end
 
   def test_dashed_db_export_statement
