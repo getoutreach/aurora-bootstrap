@@ -65,4 +65,4 @@ INSERT INTO user_properties.avatars ( user_id, link ) VALUES ( 1, "http://placek
 INSERT INTO user_properties.hypersensitive_data ( user_id, secrets ) VALUES ( 1, "What I did last summer." );
 INSERT INTO user_stuff.photos ( user_id, link ) VALUES ( 1, "http://placekitten.com/480/320" );
 INSERT INTO user_stuff.websites ( user_id, link ) VALUES ( 1, "http://placekitten.com" );
-INSERT INTO `user_name-test`.`avatars` ( user_id, link ) VALUES ( 1, "http://placekitten.com/320/320" );
+INSERT INTO `user_name-test`.`images` ( user_id, link ) VALUES ( 1, "http://placekitten.com/320/320" );
