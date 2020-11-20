@@ -5,10 +5,11 @@ module AuroraBootstrapper
       @database_name      = database_name
       @table_name         = table_name
       @client             = client
+      @export_date        = ENV.fetch( 'EXPORT_DATE', nil )
     end
 
     def fields
-      @fields ||= @client.query("DESC #{ @database_name }.#{ @table_name }").map do | row |
+      @fields ||= @client.query("DESC `#{ @database_name }`.`#{ @table_name }`").map do | row |
         row[ "Field" ]
       end.reject do | field |
         blacklisted_field?( field )
@@ -53,7 +54,8 @@ module AuroraBootstrapper
     end
 
     def export!( into_bucket: )
-      result = @client.query( export_statement( into_bucket: into_bucket ) )
+      AuroraBootstrapper.logger.info( message:"Running: #{ export_statement( into_bucket: into_bucket ) }" )
+      @client.query( export_statement( into_bucket: into_bucket ) )
       AuroraBootstrapper.logger.info( message:"Export succeeded: #{@database_name}.#{@table_name}" )
       true
     rescue => e
@@ -62,10 +64,11 @@ module AuroraBootstrapper
     end
 
     def export_statement( into_bucket: )
+      path = [into_bucket, @export_date, @database_name, @table_name ].compact.join('/')
       <<~SQL
         SELECT #{ json_object }
           FROM `#{ @database_name }`.`#{ @table_name }`
-        INTO OUTFILE S3 '#{ into_bucket }/#{ @database_name }/#{ @table_name }'
+        INTO OUTFILE S3 '#{ path }'
           MANIFEST ON
           OVERWRITE ON
       SQL

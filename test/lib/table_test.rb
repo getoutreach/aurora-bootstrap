@@ -13,8 +13,12 @@ class TableTest < Minitest::Test
     @exporter = AuroraBootstrapper::Exporter.new( client: @client,
                                                   prefix: @prefix,
                                            export_bucket: @bukkit )
+
     @table    = AuroraBootstrapper::Table.new database_name: "master",
                                                  table_name: "users",
+                                                     client: @client
+    @table2   = AuroraBootstrapper::Table.new database_name: "user_name-test",
+                                                 table_name: "images",
                                                      client: @client
   end
 
@@ -35,11 +39,34 @@ class TableTest < Minitest::Test
     expected = <<~SQL
       SELECT JSON_OBJECT( 'database', 'master', 'table', 'users', 'type', 'backfill', 'ts', unix_timestamp(), 'data', JSON_OBJECT('id', `id`, 'email', `email`, 'first_name', `first_name`, 'last_name', `last_name` ) )
         FROM `master`.`users`
+      INTO OUTFILE S3 's3://bukkit/10-12-2020/master/users'
+        MANIFEST ON
+        OVERWRITE ON
+    SQL
+    assert_equal expected, @table.export_statement( into_bucket: "s3://bukkit")
+  end
+
+  def test_undated_export_statement
+    @table.instance_variable_set(:@export_date, nil)
+    expected = <<~SQL
+      SELECT JSON_OBJECT( 'database', 'master', 'table', 'users', 'type', 'backfill', 'ts', unix_timestamp(), 'data', JSON_OBJECT('id', `id`, 'email', `email`, 'first_name', `first_name`, 'last_name', `last_name` ) )
+        FROM `master`.`users`
       INTO OUTFILE S3 's3://bukkit/master/users'
         MANIFEST ON
         OVERWRITE ON
     SQL
     assert_equal expected, @table.export_statement( into_bucket: "s3://bukkit")
+  end
+
+  def test_dashed_db_export_statement
+    expected = <<~SQL
+      SELECT JSON_OBJECT( 'database', 'user_name-test', 'table', 'images', 'type', 'backfill', 'ts', unix_timestamp(), 'data', JSON_OBJECT('id', `id`, 'user_id', `user_id`, 'link', `link` ) )
+        FROM `user_name-test`.`images`
+      INTO OUTFILE S3 's3://bukkit/10-12-2020/user_name-test/images'
+        MANIFEST ON
+        OVERWRITE ON
+    SQL
+    assert_equal expected, @table2.export_statement( into_bucket: "s3://bukkit")
   end
 
   def test_export_logs

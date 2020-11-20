@@ -20,6 +20,11 @@ class DatabaseTest < Minitest::Test
     assert_equal [ "users", "websites" ], database.table_names
   end
 
+  def test_table_names_for_dashed_databases
+    database = AuroraBootstrapper::Database.new database_name: "user_name-test", client: @client, blacklisted_tables: []
+
+    assert_equal [ "images" ], database.table_names
+  end
 
   def test_globally_blacklisted_tables
     blacklist       = ["websites"]
