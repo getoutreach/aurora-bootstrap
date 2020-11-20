@@ -13,6 +13,7 @@ class TableTest < Minitest::Test
     @exporter = AuroraBootstrapper::Exporter.new( client: @client,
                                                   prefix: @prefix,
                                            export_bucket: @bukkit )
+
     @table    = AuroraBootstrapper::Table.new database_name: "master",
                                                  table_name: "users",
                                                      client: @client
@@ -38,7 +39,7 @@ class TableTest < Minitest::Test
     expected = <<~SQL
       SELECT JSON_OBJECT( 'database', 'master', 'table', 'users', 'type', 'backfill', 'ts', unix_timestamp(), 'data', JSON_OBJECT('id', `id`, 'email', `email`, 'first_name', `first_name`, 'last_name', `last_name` ) )
         FROM `master`.`users`
-      INTO OUTFILE S3 's3://bukkit/master/users'
+      INTO OUTFILE S3 's3://bukkit/10-12-2020/master/users'
         MANIFEST ON
         OVERWRITE ON
     SQL
@@ -46,10 +47,7 @@ class TableTest < Minitest::Test
   end
 
   def test_undated_export_statement
-    ENV['EXPORT_DATE'] = nil
-    table    = AuroraBootstrapper::Table.new database_name: "master",
-                                                 table_name: "users",
-                                                     client: @client
+    @table.instance_variable_set(:@export_date, nil)
     expected = <<~SQL
       SELECT JSON_OBJECT( 'database', 'master', 'table', 'users', 'type', 'backfill', 'ts', unix_timestamp(), 'data', JSON_OBJECT('id', `id`, 'email', `email`, 'first_name', `first_name`, 'last_name', `last_name` ) )
         FROM `master`.`users`
@@ -57,8 +55,7 @@ class TableTest < Minitest::Test
         MANIFEST ON
         OVERWRITE ON
     SQL
-    assert_equal expected, table.export_statement( into_bucket: "s3://bukkit")
-    ENV['EXPORT_DATE'] = "10-12-2020"
+    assert_equal expected, @table.export_statement( into_bucket: "s3://bukkit")
   end
 
   def test_dashed_db_export_statement

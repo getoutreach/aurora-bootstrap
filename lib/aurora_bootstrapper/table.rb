@@ -55,7 +55,7 @@ module AuroraBootstrapper
 
     def export!( into_bucket: )
       AuroraBootstrapper.logger.info( message:"Running: #{ export_statement( into_bucket: into_bucket ) }" )
-      result = @client.query( export_statement( into_bucket: into_bucket ) )
+      @client.query( export_statement( into_bucket: into_bucket ) )
       AuroraBootstrapper.logger.info( message:"Export succeeded: #{@database_name}.#{@table_name}" )
       true
     rescue => e
