@@ -59,6 +59,18 @@ class DatabaseTest < Minitest::Test
     assert_equal [ "avatars" ], properties_database.table_names
   end
 
+  def test_regexp_whitelisted_tables
+    whitelist           = ["master.websites", "/.*sensitive.*/"]
+    master_database     = AuroraBootstrapper::Database.new database_name: "master", client: @client, whitelisted_tables: whitelist
+    properties_database = AuroraBootstrapper::Database.new database_name: "user_properties", client: @client, whitelisted_tables: whitelist
+    stuff_database      = AuroraBootstrapper::Database.new database_name: "user_stuff", client: @client, whitelisted_tables: whitelist
+
+
+    assert_equal [ "websites" ], master_database.table_names
+    assert_equal [ ], stuff_database.table_names
+    assert_equal [ "hypersensitive_data" ], properties_database.table_names
+  end
+
   def test_export_calls_table
     mock = Minitest::Mock.new
     mock.expect :export!, nil

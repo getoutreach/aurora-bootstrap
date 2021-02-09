@@ -28,4 +28,10 @@ The container needs to know what to connect to and the way the script works is i
 * `PPREFIX`*[optional]*: The prefix for databases to be scanned. So, like, if you name all your databases `fun_objects`, `fun_properties`, etc, you would set the `PREFIX` to be `fun` and the bootstrapper will omit any on-prefixed databases. Helpful if you don't want to export `information_schema`, `performance_schema` and `innodb`
 * `EXPORT_BUCKET`: The name of the bucket into which the CSV will go
 * `BLACKLISTED_TABLES`*[optional]*: If you want to omit tables, you can list them here in a comma separated format. We support db-agnostic tables (e.g. `super_sensitive_data` will be ignored in every db scanned) as well as db-specific(e.g. `users.photos` will only ignore `photos` in the `users` database, but nowhere else (`kittens.photos` will still backfill)). You can also specify the tables in a regular expression starting and wnding with a `/` (e.g. `/.*password.*/` will filter out any table with `password` in its or its database's name)
+* `WHITELISTED_TABLES`*[optional]*: If you want to only include certain tables and omit the rest, you can specify a whitelist instead of a blacklist. All the same matching rules as blacklisting apply.
 * `BLACKLISTED_FIELDS`*[optional]*: Similarly to the table blacklisting, if you wanted to blacklist fields, you can list them in the same format as the tables, including the regexp.
+
+__NOTE__: here are the rules for black and white listing tables:
+* only whitelist will act as blacklist: \*, whitelist: selection
+* only blacklist will act as whitelist: \*, blacklist: selection
+* when both are specified, blacklist will be applied first
