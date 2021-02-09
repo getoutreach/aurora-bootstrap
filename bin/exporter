@@ -13,6 +13,7 @@ loader.eager_load
 prefix             = ENV.fetch "PREFIX", ""
 bukkit             = ENV.fetch "EXPORT_BUCKET"
 blacklisted_tables = ENV.fetch "BLACKLISTED_TABLES", ""
+whitelisted_tables = ENV.fetch "WHITELISTED_TABLES", ""
 blacklisted_fields = ENV.fetch "BLACKLISTED_FIELDS", ""
 
 client    = ConnectionPool::Wrapper.new(size: 15, timeout: 3) do
@@ -25,4 +26,5 @@ AuroraBootstrapper::Exporter.new( client: client,
                                   prefix: prefix,
                            export_bucket: bukkit,
                       blacklisted_tables: blacklisted_tables,
+                      whitelisted_tables: whitelisted_tables,
                       blacklisted_fields: blacklisted_fields ).export!
