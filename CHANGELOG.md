@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.2
 - [#12](https://github.com/gaorlov/aurora-bootstrap/pull/12) - adding table whitelisting
 
 ## 0.1.1.7
