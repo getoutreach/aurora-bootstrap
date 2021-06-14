@@ -9,17 +9,19 @@ class TableTest < Minitest::Test
                                 username: ENV.fetch( "DB_USER" ),
                                 password: ENV.fetch( "DB_PASS" ))
 
-
     @exporter = AuroraBootstrapper::Exporter.new( client: @client,
                                                   prefix: @prefix,
-                                           export_bucket: @bukkit )
+                                           export_bucket: @bukkit)
 
     @table    = AuroraBootstrapper::Table.new database_name: "master",
                                                  table_name: "users",
-                                                     client: @client
+                                                     client: @client,
+                                                     export_date: '10-12-2020'
+
     @table2   = AuroraBootstrapper::Table.new database_name: "user_name-test",
                                                  table_name: "images",
-                                                     client: @client
+                                                     client: @client,
+                                                     export_date: '10-12-2020'
   end
 
   def test_fields
@@ -76,16 +78,15 @@ class TableTest < Minitest::Test
       end
 
       @client.stubs( :query ).returns( "yay" )
-      
-      assert_output( /Export succeeded: / ) do
-        assert @table.export!( into_bucket: "s3://bukkit")
+      assert_output( /Export succeeded/ ) do
+        assert @table.export!( into_bucket: "s3://bukkit" )
       end
     end
   end
 
   def test_blacklisted_fields
     table = table_with_blacklist( ["first_name", "users.last_name", "master.users.email"] )
-    
+
     assert table.blacklisted_field?( "first_name" )
     assert table.blacklisted_field?( "last_name" )
     assert table.blacklisted_field?( "email" )
@@ -93,7 +94,7 @@ class TableTest < Minitest::Test
 
   def test_blacklisted_fields_with_regexps 
     table = table_with_blacklist( ["/first.*/", "/users.last.*/", "/.*.users.email/"] )
-    
+
     assert table.blacklisted_field?( "email" )
     assert table.blacklisted_field?( "first_name" )
     assert table.blacklisted_field?( "last_name" )    
@@ -120,8 +121,9 @@ class TableTest < Minitest::Test
 
       AuroraBootstrapper::Table.any_instance.stubs( :export_statement ).returns( "select 'hurrah'" )
 
-      assert @exporter.export!
+      AuroraBootstrapper::Notifier.any_instance.stubs( :notify ).returns( true )
 
+      assert @exporter.export!
     end
   end
 

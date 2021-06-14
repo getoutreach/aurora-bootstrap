@@ -11,10 +11,12 @@ module AuroraBootstrapper
       @whitelisted_tables = whitelisted_tables.split(",")
       @blacklisted_fields = blacklisted_fields.split(",")
       @client             = client
+      @notifier           = Notifier.new
     end
 
     def export!
       @client.query( "set sql_mode='NO_BACKSLASH_ESCAPES'" )
+
       database_names.all? do | database_name |
         begin
           @client.query( "use `#{database_name}`" )
@@ -22,12 +24,15 @@ module AuroraBootstrapper
                                          client: @client,
                              blacklisted_tables: @blacklisted_tables,
                              whitelisted_tables: @whitelisted_tables,
-                             blacklisted_fields: @blacklisted_fields
+                             blacklisted_fields: @blacklisted_fields,
+                             export_date: @notifier.export_date
           database.export! into_bucket: @export_bucket
         rescue => e
           AuroraBootstrapper.logger.error message: "Error in database #{database_name}", error: e
         end
       end
+
+      @notifier.notify
     end
 
     def database_names

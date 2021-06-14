@@ -1,11 +1,13 @@
+require 'aws-sdk-s3'
+
 module AuroraBootstrapper
   class Table
-    def initialize( database_name:, table_name:, client:, blacklisted_fields: [] )
+    def initialize( database_name:, table_name:, client:, blacklisted_fields: [], export_date: nil)
       @blacklisted_fields = blacklisted_fields
       @database_name      = database_name
       @table_name         = table_name
       @client             = client
-      @export_date        = ENV.fetch( 'EXPORT_DATE', nil )
+      @export_date        = export_date
     end
 
     def fields
@@ -23,7 +25,6 @@ module AuroraBootstrapper
         bl_field_name    = blacklisted_field
         bl_table_name    = @table_name
         bl_database_name = @database_name
-
 
         if blacklisted_field.match( /\/.*\// )
           regexp         = blacklisted_field.slice(1...-1)
@@ -54,9 +55,9 @@ module AuroraBootstrapper
     end
 
     def export!( into_bucket: )
-      AuroraBootstrapper.logger.info( message:"Running: #{ export_statement( into_bucket: into_bucket ) }" )
+      AuroraBootstrapper.logger.info( message: "Running Export: #{ export_statement( into_bucket: into_bucket ) }" )
       @client.query( export_statement( into_bucket: into_bucket ) )
-      AuroraBootstrapper.logger.info( message:"Export succeeded: #{@database_name}.#{@table_name}" )
+      AuroraBootstrapper.logger.info( message: "Export succeeded: #{@database_name}.#{@table_name}" )
       true
     rescue => e
       AuroraBootstrapper.logger.fatal( mesasge: "Export statement '#{export_statement( into_bucket: into_bucket )}' failed", error: e )
@@ -73,5 +74,6 @@ module AuroraBootstrapper
           OVERWRITE ON
       SQL
     end
+
   end
 end

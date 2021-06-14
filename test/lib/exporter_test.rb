@@ -11,7 +11,7 @@ class ExporterTest < Minitest::Test
 
     @exporter = AuroraBootstrapper::Exporter.new( client: @client,
                                                   prefix: @prefix,
-                                           export_bucket: @bukkit )
+                                           export_bucket: @bukkit)
   end
 
   def test_database_names
@@ -23,7 +23,7 @@ class ExporterTest < Minitest::Test
 
     everything_exporter = AuroraBootstrapper::Exporter.new( client: @client,
                                                             prefix: "",
-                                                     export_bucket: @bukkit )
+                                                     export_bucket: @bukkit)
 
     assert_empty [ "information_schema", "master", "mysql", "performance_schema", "sys", "user_properties", "user_stuff" ] - everything_exporter.database_names
   end
@@ -32,7 +32,7 @@ class ExporterTest < Minitest::Test
     with_puts_logger do
       exporter = AuroraBootstrapper::Exporter.new( client: nil,
                                                     prefix: @prefix,
-                                             export_bucket: @bukkit )
+                                             export_bucket: @bukkit)
 
       assert_output "{:message=>\"Error getting databases\", :error=>#<NoMethodError: undefined method `query' for nil:NilClass>}\n" do
         exporter.database_names
@@ -44,6 +44,8 @@ class ExporterTest < Minitest::Test
     with_puts_logger do
       AuroraBootstrapper::Database.any_instance.stubs( :table_names ).returns( 5 )
 
+      AuroraBootstrapper::Notifier.any_instance.stubs( :notify ).returns( true )
+
       assert_output "{:message=>\"Error in database user_name-test\", :error=>#<NoMethodError: undefined method `all?' for 5:Integer>}\n" do
         @exporter.export!
       end
@@ -51,11 +53,10 @@ class ExporterTest < Minitest::Test
   end
 
   def test_export_calls_database
-    mock = Minitest::Mock.new
-    mock.expect :export!, nil
-
     AuroraBootstrapper::Database.any_instance.stubs( :export! ).returns( true )
     
+    AuroraBootstrapper::Notifier.any_instance.stubs( :notify ).returns( true )
+
     assert @exporter.export!
   end
 end

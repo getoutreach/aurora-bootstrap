@@ -28,4 +28,4 @@ AuroraBootstrapper::Exporter.new( client: client,
                            export_bucket: bukkit,
                       blacklisted_tables: blacklisted_tables,
                       whitelisted_tables: whitelisted_tables,
-                      blacklisted_fields: blacklisted_fields ).export!
+                      blacklisted_fields: blacklisted_fields).export!
