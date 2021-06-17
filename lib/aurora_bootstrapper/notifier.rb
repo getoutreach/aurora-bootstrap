@@ -1,3 +1,5 @@
+require 'aws-sdk-s3'
+
 module AuroraBootstrapper
   class Notifier
     def initialize( s3_path: s3_path)
@@ -8,8 +10,9 @@ module AuroraBootstrapper
       @export_date ||= ENV.fetch('EXPORT_DATE', export_date_override )
     end
     
+    # ENV is string to string dictionary
     def export_date_override
-      DateTime.now.strftime("%Y-%m-%d") if ENV.fetch('EXPORT_DATE_OVERRIDE', false)
+      DateTime.now.strftime("%Y-%m-%d") if ENV.key?('EXPORT_DATE_OVERRIDE')
     end
 
     def notify
