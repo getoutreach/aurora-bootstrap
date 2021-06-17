@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.1
+- [#14](https://github.com/gaorlov/aurora-bootstrap/pull/14) - updating `EXPORT_DATE_OVERRIDE` behavior to be truthy if present and falsey when absent
+
 ## 0.2.0
 - [#13](https://github.com/gaorlov/aurora-bootstrap/pull/13) - adding notification functionality to publish to S3 when export is complete
 
