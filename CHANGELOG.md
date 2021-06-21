@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.2
+- Fixing typo
+
 ## 0.2.1
 - [#14](https://github.com/gaorlov/aurora-bootstrap/pull/14) - updating `EXPORT_DATE_OVERRIDE` behavior to be truthy if present and falsey when absent
 
