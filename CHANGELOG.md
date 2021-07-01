@@ -1,5 +1,7 @@
 # Changelog
 ## Unreleased
+
+## 0.2.4
 - [#18](https://github.com/gaorlov/aurora-bootstrap/pull/18/) - Read passwords from vault
 - [#17](https://github.com/gaorlov/aurora-bootstrap/pull/17) - Fix: (1) the data files from db dump running for longer than one day should be in one location
 
