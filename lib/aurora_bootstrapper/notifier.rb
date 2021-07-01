@@ -2,6 +2,8 @@ require 'aws-sdk-s3'
 
 module AuroraBootstrapper
   class Notifier
+    DATE_FORMAT = "%Y-%m-%d"
+
     def initialize( s3_path: )
       @s3_path = s3_path
     end
@@ -12,7 +14,25 @@ module AuroraBootstrapper
     
     # ENV is string to string dictionary
     def export_date_override
-      DateTime.now.strftime("%Y-%m-%d") if ENV.key?('EXPORT_DATE_OVERRIDE')
+      return nil unless ENV.key?('EXPORT_DATE_OVERRIDE')
+
+      today = Date.today
+      days_ago = (0..30).find do | days_ago |
+        exists_export? date: today-days_ago
+      end.to_i
+
+      days_ago -= 1 unless days_ago.zero?
+      ( today - days_ago ).strftime( DATE_FORMAT )
+    end
+
+    def exists_export?( date: )
+      prefix = [ bucket_path, date.strftime( DATE_FORMAT ) ].join( '/' )
+
+      client.list_objects_v2({ 
+        bucket: bucket,
+        prefix: prefix }).contents.find do | object | 
+          object.key.include? "DONE"
+        end
     end
 
     def notify
