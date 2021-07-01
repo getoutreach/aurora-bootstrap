@@ -1,9 +1,10 @@
 # Changelog
+
 ## Unreleased
 
 ## 0.2.4
 - [#18](https://github.com/gaorlov/aurora-bootstrap/pull/18/) - Read passwords from vault
-- [#17](https://github.com/gaorlov/aurora-bootstrap/pull/17) - Fix: (1) the data files from db dump running for longer than one day should be in one location
+- [#17](https://github.com/gaorlov/aurora-bootstrap/pull/17) - `export_date_override` will check for the most recent export date (for the last 30 days) in S3 before defaulting to today's date to enable consistent dating for long running exports
 
 ## 0.2.3
 - [#16](https://github.com/gaorlov/aurora-bootstrap/pull/16) - Pass in s3path to Notifier
