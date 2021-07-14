@@ -2,8 +2,11 @@
 
 ## Unreleased
 
+## 0.2.5
+- [#19](https://github.com/gaorlov/aurora-bootstrap/pull/18) - Fix Utility.db_pass
+
 ## 0.2.4
-- [#18](https://github.com/gaorlov/aurora-bootstrap/pull/18/) - Read passwords from vault
+- [#18](https://github.com/gaorlov/aurora-bootstrap/pull/18) - Read passwords from vault
 - [#17](https://github.com/gaorlov/aurora-bootstrap/pull/17) - `export_date_override` will check for the most recent export date (for the last 30 days) in S3 before defaulting to today's date to enable consistent dating for long running exports
 
 ## 0.2.3
