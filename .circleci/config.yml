@@ -9,7 +9,6 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
           version: 18.09.3
-      # Load schema cache for inclusion in docker image
       - run:
           name: Build and Push Docker Image
           command: |
