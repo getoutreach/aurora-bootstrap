@@ -1,4 +1,12 @@
-version: 2
+# Python CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-python/ for more details
+#
+version: 2.1
+parameters:
+  build_mode:
+    type: string
+    default: "sampled"
 jobs:
   build_docker_image:
     docker:
@@ -42,7 +50,8 @@ jobs:
             docker tag "${IMAGE_NAME}" "${sha1_image_name}"
             docker push "${private_registry_base_name}"
             docker push "${versioned_image_name}"
-            docker push "${sha1_image_name}"   
+            docker push "${sha1_image_name}"    
+
 workflows:
   version: 2
   build_and_test:
