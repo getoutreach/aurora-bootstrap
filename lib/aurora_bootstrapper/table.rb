@@ -64,9 +64,13 @@ module AuroraBootstrapper
 
     def export_statement( into_bucket: )
       path = [into_bucket, @export_date, @database_name, @table_name ].compact.join('/')
+      export_date_dt = Datetime.strptime(@export_date, "%Y-%m-%d")
+      lower_bound = ( export_date_dt - 30 ).strftime( "%Y-%m-%d" )
       <<~SQL
         SELECT #{ json_object }
           FROM `#{ @database_name }`.`#{ @table_name }`
+          WHERE `#{ @database_name }`.`#{ @table_name }`.`updated_at` >= '#{ lower_bound }' and 
+            `#{ @database_name }`.`#{ @table_name }`.`updated_at` < `#{ @export_date }`
         INTO OUTFILE S3 '#{ path }'
           MANIFEST ON
           OVERWRITE ON
