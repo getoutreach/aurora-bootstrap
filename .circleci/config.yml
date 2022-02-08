@@ -10,7 +10,7 @@ parameters:
 jobs:
   build_docker_image:
     docker:
-      - image: circleci/ruby:2.6
+      - image: cimg/ruby:2.6
     steps:
       - add_ssh_keys
       - checkout
