@@ -1,3 +1,7 @@
+# Archived
+
+This repo is archived.  Use [getoutreach/aurora-bootstrap-ruby](https://github.com/getoutreach/aurora-bootstrap-ruby) instead.
+
 # Bootstrapping Aurora to S3
 
 The fastest way we found to get full table data out of Aurora into S3 is to use the Aurora feature of `SELECT INTO OUTFILE S3`. This repo automates this process to some degree.
